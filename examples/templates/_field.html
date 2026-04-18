@@ -1,0 +1,54 @@
+{# Wrapper used by the example forms' Meta.field_wrapper.
+
+   Fields with their own structure (hidden inputs, buttons, field lists,
+   sub-forms) render their widget directly. Other fields get a
+   ``<div id="wrap-<id>">`` with label, input, datalist and errors.
+   Partial responses swap that whole wrapper.
+
+   ``field.widget(...)`` is used instead of ``field()``, which would
+   render this template again. ``field.datalist()`` is empty without a
+   ``DataList``. When its choices are a callable, the library makes it
+   refresh as the user types.
+#}
+{% if field.type in ('HiddenField', 'CSRFTokenField', 'SubmitField', 'ButtonField', 'FieldList', 'FormField') or (field.option_widget is defined and field.option_widget.__class__.__name__ in ('Button', 'SubmitInput')) %}
+  {{ field.widget(field, **render_kw) }}
+{% elif field.type == 'BooleanField' %}
+  <div id="wrap-{{ field.id }}" class="field">
+    <label for="{{ field.id }}">
+      {% if field.errors %}
+        {{ field.widget(field, aria_invalid='true', **render_kw) }}
+      {% else %}
+        {{ field.widget(field, **render_kw) }}
+      {% endif %}
+      {{ field.label.text }}
+    </label>
+    {% if field.errors %}
+      <ul class="errors">
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% else %}
+  <div id="wrap-{{ field.id }}" class="field">
+    {{ field.label() }}
+  {# The success cue needs a posted, non-empty value. Fields changed by a
+     callback get none: the dispatch clears their ``raw_data``. #}
+    {% if field.errors %}
+      {{ field.widget(field, aria_invalid='true', **render_kw) }}
+    {% elif field.raw_data and field.raw_data[0] %}
+      {{ field.widget(field, aria_invalid='false', **render_kw) }}
+    {% else %}
+      {{ field.widget(field, **render_kw) }}
+    {% endif %}
+    {{ field.datalist() }}
+    {% if field.errors %}
+      <ul class="errors">
+        {% for error in field.errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endif %}

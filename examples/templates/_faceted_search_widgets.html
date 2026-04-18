@@ -1,0 +1,75 @@
+{# FacetedSearchForm.chips: chips inline inside the search bar.
+   Repainted on every facet change (multi-target trigger) so the
+   chips and the result list stay in sync. References ``kwargs`` so
+   Jinja captures the hx-* attrs that ``Meta.render_field`` injects
+   on the field call. #}
+
+{%- macro chips_strip(field) -%}
+  {%- set form = field._form -%}
+  {%- set facets = form.active_facets() -%}
+  <div class="facets-chips-strip" id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    {% for name, label in facets %}
+      <span class="chip" data-facet="{{ name }}">
+        <span class="chip-label">{{ label }}</span>
+        {{ form.clear(value=name, label="×", id=False,
+        class_="chip-remove", aria_label="Clear " ~ label) }}
+      </span>
+    {% endfor %}
+  </div>
+{%- endmacro -%}
+
+
+{# FacetedSearchForm.filters: the panel inside ``<details>``.
+   Repainted only when a chip is cleared (multi-target from
+   ``clear``); plain facet changes leave the dropdown's DOM
+   untouched so the user's current selection persists naturally.
+   The swap is of the inner panel, so ``<details open>`` survives. #}
+
+{%- macro filters_panel(field) -%}
+  {%- set form = field._form -%}
+  <div class="facets-panel" id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    <div class="facets-grid">
+      {{ form.genre() }}
+      {{ form.author() }}
+      {{ form.language() }}
+      <div class="facets-year-range">
+        {{ form.year_from() }}
+        {{ form.year_to() }}
+      </div>
+    </div>
+    <div class="facets-actions">
+      {{ form.apply() }}
+    </div>
+  </div>
+{%- endmacro -%}
+
+
+{# Book listing rendered as a plain DOM section (not a field).
+   Re-rendered via the ``repaint_results`` callback wired on every
+   facet / query trigger that targets ``#results``. #}
+
+{%- macro results_section(form) -%}
+  {%- set books = form.filter_books() -%}
+  <section class="facets-results" id="results" aria-live="polite" aria-atomic="false">
+    <header class="facets-results-header">
+      <strong>{{ books | length }}</strong>
+      book{{ "" if books | length == 1 else "s" }} match
+    </header>
+    {% if books %}
+      <ul class="facets-results-list" role="list">
+        {% for book in books %}
+          <li class="facets-result">
+            <span class="facets-result-title">{{ book.title }}</span>
+            <span class="facets-result-meta">
+              {{ book.author }} · {{ book.year }} · {{ book.language }} · {{ book.genre }}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="facets-results-empty">
+        No book matches the search. Loosen a filter or shorten the query.
+      </p>
+    {% endif %}
+  </section>
+{%- endmacro -%}

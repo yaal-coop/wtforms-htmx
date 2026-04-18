@@ -1,0 +1,266 @@
+/* Faceted search: chips inside the search bar, dropdown panel,
+   listing below. The bar is one ``role="group"`` toolbar; the
+   ``.facets-bar-input`` container imitates a native search input
+   (icon + bare ``<input>`` + chips inline) so chips ride alongside
+   the cursor in the same field. */
+
+/* ----- Toolbar (input + dropdown grouped) ----------------------------- */
+
+.facets-bar {
+  margin-bottom: 1rem;
+}
+
+/* ----- Bar input (chips strip + bare query field) -------------------- */
+
+.facets-bar-input {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--pico-form-element-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  transition:
+    border-color var(--pico-transition),
+    box-shadow var(--pico-transition);
+}
+
+/* Magnifier icon: replaces Pico's input[type="search"] background
+   image (which we strip below so chips can sit inside the field). */
+.facets-bar-input::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  background-image: var(--pico-icon-search);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.55;
+}
+
+/* The chips strip is a swap target (htmx replaces it on facet
+   changes). ``display: contents`` makes its wrapper transparent to
+   layout, so chips flow as siblings of the bare input in the same
+   flex line. */
+.facets-bar-input > .facets-chips-strip {
+  display: contents;
+}
+
+/* Bare inner input: no border, no magnifier (we paint our own),
+   no padding reservation, no Pico-forced ``height``. */
+.facets-bar-input > input[type="search"] {
+  flex: 1 1 8rem;
+  min-width: 6rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  background-image: none;
+  padding-inline-start: 0;
+  font-size: 1rem;
+  height: auto;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+.facets-bar-input > input[type="search"]:focus {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+/* Container shows the focus ring instead of the inner input. */
+.facets-bar:focus-within .facets-bar-input {
+  border-color: var(--pico-primary-border);
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
+}
+
+/* ----- Dropdown ------------------------------------------------------- */
+
+/* Pico defaults ``[role=group] > *`` to ``flex: 1 1 auto``, so undo
+   that and the dropdown only takes its summary's natural width
+   instead of sharing horizontal space with the bar-input. */
+.facets-bar > .facets-dropdown {
+  flex: 0 0 auto;
+}
+
+/* Don't make ``<details>`` itself a flex container: Firefox has
+   long-standing issues where native ``<select>`` popups inside a
+   ``display: flex`` ``<details>`` swallow the click. Summary is
+   absolutely positioned to fill the ``<details>`` box; the box
+   itself is stretched by Pico's role="group" align-items default. */
+.facets-dropdown {
+  position: relative;
+  min-width: 7rem;
+}
+
+/* Selector goes through ``details.facets-dropdown >`` so the
+   specificity (0,2,2) beats Pico's ``details summary:not([role])``
+   (0,1,2), which otherwise forces a low-contrast accordion color. */
+details.facets-dropdown > summary.facets-dropdown-summary {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 1rem;
+  border: 0;
+  border-top-right-radius: var(--pico-border-radius);
+  border-bottom-right-radius: var(--pico-border-radius);
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  font-size: 0.95rem;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+}
+
+/* Pico hides the native disclosure triangle but its ``::after``
+   chevron and an ``[open]>summary{margin-bottom}`` rule still fire.
+   Kill both to keep the bar height stable across open/close. */
+.facets-dropdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.facets-dropdown-summary::before,
+.facets-dropdown-summary::after {
+  content: none;
+}
+
+details.facets-dropdown[open] > summary.facets-dropdown-summary {
+  margin-bottom: 0;
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+}
+
+/* Panel content. Absolutely positioned so opening the dropdown does
+   not push the listing down. Pinned right-aligned to the dropdown
+   trigger; collapses to a static block on narrow screens. */
+.facets-panel {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  min-width: 28rem;
+  z-index: 5;
+  padding: 1rem;
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-background-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 600px) {
+  .facets-panel {
+    position: static;
+    top: auto;
+    min-width: 0;
+    margin-top: 0.5rem;
+  }
+}
+
+.facets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem 1rem;
+}
+
+@media (max-width: 600px) {
+  .facets-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Year range: two inputs side by side under a single visual unit. */
+.facets-year-range {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  grid-column: 1 / -1;
+}
+
+.facets-year-range > .field {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.facets-panel .field {
+  margin-bottom: 0;
+}
+
+.facets-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.facets-actions > button.save,
+.facets-actions > button[type="submit"],
+.facets-actions > input[type="submit"] {
+  margin: 0;
+  width: auto;
+  padding-inline: 1.5rem;
+}
+
+/* ----- Results -------------------------------------------------------- */
+
+.facets-results {
+  padding: 0.5rem 0;
+}
+
+.facets-results-header {
+  margin: 0 0 0.75rem 0;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--pico-muted-color);
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.facets-results-header > strong {
+  color: var(--pico-color);
+  font-size: 1.1rem;
+  margin-right: 0.25rem;
+}
+
+.facets-results-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.facets-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-card-background-color);
+}
+
+.facets-result-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.facets-result-meta {
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+}
+
+.facets-results-empty {
+  margin: 1rem 0;
+  padding: 1rem;
+  text-align: center;
+  color: var(--pico-muted-color);
+  font-style: italic;
+  background: var(--pico-card-background-color);
+  border-radius: var(--pico-border-radius);
+}

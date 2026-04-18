@@ -1,0 +1,74 @@
+/* ------------------------------------------------------------------
+ * Markdown preview: textarea on the left, rendered preview on the
+ * right. The preview lives at ``#preview`` and is swapped via
+ * ``content.triggers("#preview", render_preview, on="input delay:300ms")``.
+ * ------------------------------------------------------------------ */
+
+.demo-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.demo-area > #wrap-content,
+.demo-area > .preview-pane {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.demo-area > #wrap-content > label,
+.preview-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: var(--pico-font-weight);
+  color: var(--pico-color);
+  line-height: var(--pico-line-height);
+}
+
+.demo-area textarea#content {
+  flex: 1;
+  resize: vertical;
+  min-height: 22rem;
+  font-family: var(--pico-font-family-monospace);
+  margin-bottom: 0;
+}
+
+.md-preview {
+  flex: 1;
+  min-height: 22rem;
+  border: 1px solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 0.75rem 1rem;
+  background: var(--pico-form-element-background-color);
+  overflow: auto;
+}
+
+.md-preview > :first-child {
+  margin-top: 0;
+}
+
+.md-preview > :last-child {
+  margin-bottom: 0;
+}
+
+.md-preview code {
+  background: var(--pico-code-background-color);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+.md-preview pre {
+  background: var(--pico-code-background-color);
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  overflow-x: auto;
+}
+
+.md-preview blockquote {
+  border-left: 3px solid var(--pico-muted-border-color);
+  margin: 0;
+  padding: 0 1rem;
+  color: var(--pico-muted-color);
+}

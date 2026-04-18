@@ -1,0 +1,31 @@
+{# TagPickerForm.tags: chips for selected, catalog for unselected.
+   Catalog buttons post the tag to ``add_tag`` (value_add); chip ×
+   buttons post it to ``rm_tag`` (value_remove). Persisted across
+   submits via multi-valued hidden inputs. #}
+{%- macro tags(field) -%}
+  {%- set selected = field.data or [] -%}
+  {%- set choices = field.iter_choices() -%}
+  <div class="tags-control" id="{{ field.id }}">
+    <div class="tags-catalog">
+      {% for choice in choices if choice.value not in selected %}
+        {{ field._form.add_tag(value=choice.value, label=choice.label, id=False, class_="tag tag-button") }}
+      {% endfor %}
+      {% if selected|length == choices|length %}
+        <small class="empty">All tags selected.</small>
+      {% endif %}
+    </div>
+
+    <div class="chips tags-chips">
+      {% for value in selected %}
+        <span class="chip">
+          <span class="chip-label">{{ value }}</span>
+          {{ field._form.rm_tag(value=value, label="×", id=False, class_="chip-remove",
+          aria_label="Remove " ~ value) }}
+          <input type="hidden" name="{{ field.name }}" value="{{ value }}">
+        </span>
+      {% else %}
+        <small class="empty">No tags selected yet.</small>
+      {% endfor %}
+    </div>
+  </div>
+{%- endmacro %}

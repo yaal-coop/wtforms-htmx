@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='combobox.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {# First submit button in the form: the one the Enter key activates. #}
+    {{ form.search(id=False, class_="visually-hidden", tabindex="-1", aria_hidden="true") }}
+    <div class="combobox-wrap demo-area">
+      {{ form.query.label }}
+      <div class="combobox">
+        <div role="group" class="combobox-search">
+          <div class="combobox-bar-input">
+            {{ form.countries }}
+            {# Without htmx, Search reloads the page: refocus the query so the
+               listbox, hidden outside :focus-within, shows the results. #}
+            {{ form.query(autofocus=form.submitter == form.search) }}
+          </div>
+          {{ form.search }}
+        </div>
+        {{ form.suggestions }}
+      </div>
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

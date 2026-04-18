@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='faceted_search.css') }}">
+{% endblock %}
+
+{% from "_faceted_search_widgets.html" import results_section %}
+
+{% block content %}
+  <form method="get">
+    {# First submit button in the form: the one the Enter key activates. #}
+    {{ form.apply(id=False, class_="visually-hidden", tabindex="-1", aria_hidden="true") }}
+    <div class="demo-area">
+      <div class="facets-bar" role="group">
+        <div class="facets-bar-input">
+          {{ form.chips() }}
+          {{ form.query() }}
+        </div>
+        <details class="facets-dropdown">
+          <summary class="facets-dropdown-summary">+ Filter</summary>
+          {{ form.filters() }}
+        </details>
+      </div>
+      {{ results_section(form) }}
+    </div>
+  </form>
+{% endblock %}

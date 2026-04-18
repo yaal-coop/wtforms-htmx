@@ -1,0 +1,18 @@
+/* ------------------------------------------------------------------
+ * Currency converter: EUR + ``→ JPY`` on the left, ``← EUR`` + JPY
+ * on the right. Each input + button pair sits in a shared ``.input-group``
+ * (see ``app.css``); this file only handles the row that places the two
+ * groups side by side.
+ * ------------------------------------------------------------------ */
+
+.currency-row {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.currency-row > .input-group {
+  flex: 1;
+  min-width: 12rem;
+}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='address.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      <div class="field address-narrow">
+        {{ form.country.label() }}
+        <div role="group">
+          {{ form.country(autocomplete="country") }}
+          {{ form.apply_country.widget(form.apply_country) }}
+        </div>
+      </div>
+      {{ form.delivery_address() }}
+      {{ form.same_billing() }}
+      {{ form.billing_address() }}
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

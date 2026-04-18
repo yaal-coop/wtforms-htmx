@@ -1,0 +1,43 @@
+{%- macro _address_fields(field, section) -%}
+  {%- set locked = not field._form.country.data -%}
+  {{ field.form.line_1(disabled=locked, autocomplete=section ~ " address-line1") }}
+  {{ field.form.line_2(disabled=locked, autocomplete=section ~ " address-line2") }}
+  <div class="address-location">
+    {# Picocss ``role="group"`` merges adjacent form controls into a
+       single visual unit (rounded outer corners, square inner ones).
+       It styles direct children, so ``postal_code`` is declared with
+       ``wrapper=False`` and the input + button sit directly under the
+       group; the label stays outside. #}
+    <div class="field">
+      {{ field.form.postal_code.label() }}
+      <div role="group">
+        {{ field.form.postal_code(disabled=locked, autocomplete=section ~ " postal-code") }}
+        {{ field.form.lookup_postal.widget(field.form.lookup_postal, disabled=locked) }}
+      </div>
+      {{ field.form.postal_code.datalist() }}
+    </div>
+    {{ field.form.city(autocomplete=section ~ " address-level2") }}
+    {{ field.form.region(autocomplete=section ~ " address-level1") }}
+    {{ field.form.region.datalist() }}
+  </div>
+{%- endmacro -%}
+
+{%- macro delivery_address(field) -%}
+  <div id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    <fieldset class="address-block">
+      <legend>Delivery address</legend>
+      {{ _address_fields(field, "shipping") }}
+    </fieldset>
+  </div>
+{%- endmacro %}
+
+{%- macro billing_address(field) -%}
+  <div id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    {% if not field._form.same_billing.data %}
+      <fieldset class="address-block">
+        <legend>Billing address</legend>
+        {{ _address_fields(field, "billing") }}
+      </fieldset>
+    {% endif %}
+  </div>
+{%- endmacro %}

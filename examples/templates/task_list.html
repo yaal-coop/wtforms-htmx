@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='task_list.css') }}">
+  <script src="{{ url_for('static', filename='sortable-fieldlist.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {{ form.reorder() }}
+    <div class="demo-area">
+      {{ form.tasks.label }}
+      {{ form.tasks() }}
+      <div role="group" class="actions">
+        {{ form.add_task(class_="secondary") }}
+        {{ form.save() }}
+      </div>
+    </div>
+  </form>
+{% endblock %}

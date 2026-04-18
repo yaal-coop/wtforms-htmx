@@ -1,0 +1,73 @@
+{% from "_htmx_boot.html" import body_attrs -%}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% if example_title %}{{ example_title }} — wtforms-htmx{% else %}wtforms-htmx examples{% endif %}</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='vendor/pico.min.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='app.css') }}">
+    <script src="{{ url_for('static', filename='toggle-htmx.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='flash-dismiss.js') }}" defer></script>
+    {# Loaded here rather than in the task list's extra_head: scripts injected
+       by the boost head-merging extension (head-support / hx-head)
+       post hx-boost ignore ``defer`` and run async. #}
+    <script src="{{ url_for('static', filename='vendor/Sortable.min.js') }}" defer></script>
+    {% if htmx_enabled %}{% include "_htmx_boot.html" %}{% endif %}
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body{{ body_attrs(htmx_enabled, htmx_boost, htmx_version) }}>
+    <aside class="examples">
+      <nav aria-label="Examples">
+        <ul>
+          <li><a href="{{ url_for('main.index') }}"
+                 {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
+            Overview
+          </a></li>
+        </ul>
+
+        <ul>
+          {% for view, title in examples.items() %}
+            <li><a href="{{ url_for('main.' ~ view) }}"
+                   {% if request.endpoint == 'main.' ~ view %}aria-current="page"{% endif %}>
+              {{ title }}
+            </a></li>
+          {% endfor %}
+        </ul>
+
+        <form method="post"
+              action="{{ url_for('main.toggle_htmx') }}"
+              id="htmx-toggle-form"
+              {% if htmx_enabled %}hx-boost="false"{% endif %}>
+          <input type="hidden" name="referer" value="{{ request.path }}">
+          <label class="htmx-switch">
+            <input type="checkbox" role="switch" name="enabled"
+                   {% if htmx_enabled %}checked{% endif %}>
+            htmx
+          </label>
+        </form>
+      </nav>
+    </aside>
+
+    <main>
+      {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+          <div class="toast toast-top-right">
+            {% for category, message in messages %}
+              {% set variant = category if category in ("success", "info", "warning", "error") else "success" %}
+              <div class="alert alert-{{ variant }} alert-dismissible" role="status">
+                <p>{{ message }}</p>
+                <button type="button" class="alert-close" aria-label="Close">×</button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if example_title %}<h1>{{ example_title }}</h1>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

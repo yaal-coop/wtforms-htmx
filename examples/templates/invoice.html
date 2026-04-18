@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='invoice.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {# First submit button in the form: the one the Enter key activates. #}
+    {{ form.save(id=False, class_="visually-hidden", tabindex="-1", aria_hidden="true") }}
+    <div class="demo-area">
+      <table class="invoice-table">
+        <colgroup>
+          <col>
+          <col class="num-col">
+          <col class="num-col">
+          <col class="num-col">
+          <col class="num-col">
+          <col class="action-col">
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col">Qty</th>
+            <th scope="col">Unit price</th>
+            <th scope="col">VAT %</th>
+            <th scope="col">Total</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        {{ form.items() }}
+        <tfoot>
+          <tr>
+            <td colspan="6" class="add-cell">{{ form.add_line(class_="outline") }}</td>
+          </tr>
+          <tr>
+            <th scope="row" colspan="4">Subtotal</th>
+            <td><output id="subtotal">{{ totals.subtotal }}</output></td>
+            <td></td>
+          </tr>
+          <tr>
+            <th scope="row" colspan="4">VAT</th>
+            <td><output id="vat_total">{{ totals.vat_total }}</output></td>
+            <td></td>
+          </tr>
+          <tr class="grand-total">
+            <th scope="row" colspan="4">Grand total</th>
+            <td><output id="grand_total">{{ totals.grand_total }}</output></td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

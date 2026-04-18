@@ -1,0 +1,56 @@
+/* ------------------------------------------------------------------
+ * Tag picker (chips + catalog)
+ * ------------------------------------------------------------------ */
+
+.tags-control {
+  margin-bottom: 1rem;
+}
+
+.tags-catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Higher specificity than Pico's ``button[type="submit"]`` (which
+   carries ``width: 100%``) so chip-shaped catalog buttons sit
+   inline on the row instead of stacking full-width. */
+.tags-catalog > button.tag-button {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  width: auto;
+}
+
+.tags-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0.35rem;
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-form-element-background-color);
+}
+
+/* Slightly larger chips than the shared ones. */
+.tags-chips .chip {
+  gap: 0.25rem;
+  padding: 0.15rem 0.15rem 0.15rem 0.55rem;
+  font-size: 0.9rem;
+}
+
+.tags-chips .chip > button.chip-remove {
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1rem;
+}
+
+.tags-control .empty {
+  color: var(--pico-muted-color);
+}

@@ -1,0 +1,103 @@
+/* ------------------------------------------------------------------
+ * Auto-save: save button that doubles as a status indicator
+ *
+ * A single ``<button type="submit">`` rendered by a per-field
+ * wrapper on a ``SubmitField`` declared with ``.triggered_by("*",
+ * autosave_commit, on="input delay:800ms")``. The wildcard listens
+ * to every typing event bubbling through the form and posts itself
+ * once the debounce settles. The button stays actionable in both
+ * modes: in no-JS it is the explicit submit, in JS it remains
+ * available to force an immediate commit between debounce windows.
+ *
+ * Three kinds drive the visual variant:
+ *   - ``idle``  : pristine "Save" label, no save attempted yet.
+ *   - ``saved`` : last commit acknowledgement.
+ *   - ``errors``: form invalid, nothing persisted.
+ * ------------------------------------------------------------------ */
+
+/* Reserve space for the inline-validation error message that pops
+   under ``email`` while the screencast cycles through the invalid
+   state. Without this, ``sphinxcontrib-screencast`` crops to the
+   final (no-error) state and clips the error frame. */
+.demo-area {
+  min-height: 24rem;
+}
+
+.auto-save-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.auto-save-status::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.auto-save-status-idle {
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+
+.auto-save-status-idle::before {
+  background: var(--pico-muted-color);
+}
+
+.auto-save-status-saved {
+  background: #d8f5c8;
+  color: #205107;
+}
+
+.auto-save-status-saved::before {
+  background: #4caf50;
+}
+
+.auto-save-status-errors {
+  background: #fde0e0;
+  color: #7a1d1d;
+}
+
+.auto-save-status-errors::before {
+  background: #d33;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .auto-save-status-saved {
+    background: #152b07;
+    color: #b8efa1;
+  }
+  :root:not([data-theme="light"]) .auto-save-status-saved::before {
+    background: #77ef3d;
+  }
+  :root:not([data-theme="light"]) .auto-save-status-errors {
+    background: #3a1414;
+    color: #f8b6b6;
+  }
+  :root:not([data-theme="light"]) .auto-save-status-errors::before {
+    background: #ff6868;
+  }
+}
+
+[data-theme="dark"] .auto-save-status-saved {
+  background: #152b07;
+  color: #b8efa1;
+}
+[data-theme="dark"] .auto-save-status-saved::before {
+  background: #77ef3d;
+}
+[data-theme="dark"] .auto-save-status-errors {
+  background: #3a1414;
+  color: #f8b6b6;
+}
+[data-theme="dark"] .auto-save-status-errors::before {
+  background: #ff6868;
+}

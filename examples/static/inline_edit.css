@@ -1,0 +1,122 @@
+/* ------------------------------------------------------------------
+ * Inline edit: read-only value with a contextual control trio.
+ *
+ * The wrapper pins both width and height explicitly so the pill keeps
+ * the same geometry whether it renders a ``<span>`` (view, 2 children:
+ * value + Edit) or an ``<input>`` (edit, 3 children: input + Save +
+ * Cancel). Without the explicit ``height``, Pico's default input
+ * padding makes the edit-mode pill ~6px taller than the view-mode
+ * span; without the fixed ``width``, the input's default ``size="20"``
+ * would stretch the pill wider than the span.
+ * ------------------------------------------------------------------ */
+
+.inline-edit-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.inline-edit {
+  display: inline-flex;
+  align-items: stretch;
+  width: 28rem;
+  height: 2.75rem;
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-form-element-background-color);
+  overflow: hidden;
+}
+
+/* Shared geometry for the three direct children: same height, no
+   margin, no own border (the wrapper owns that), neutral line-height
+   so the content centres vertically within the fixed wrapper height. */
+.inline-edit > .inline-edit-value,
+.inline-edit > input.inline-edit-input,
+.inline-edit > button.inline-edit-toggle {
+  height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  font-size: 1rem;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+
+.inline-edit-value {
+  display: inline-flex;
+  align-items: center;
+  flex: 1;
+  padding: 0 0.85rem;
+  color: var(--pico-color);
+}
+
+/* Higher specificity than Pico's ``input[type="text"]`` defaults so the
+   input sits flush inside the wrapper without its own border or radius. */
+.inline-edit > input.inline-edit-input {
+  flex: 1;
+  padding: 0 0.85rem;
+  background: transparent;
+  outline: 0;
+  box-shadow: none;
+}
+
+.inline-edit > input.inline-edit-input:focus {
+  background-color: var(--pico-form-element-background-color);
+  box-shadow: inset 0 0 0 2px var(--pico-primary);
+}
+
+/* Higher specificity than Pico's ``button[type="submit"]`` (which carries
+   ``width: 100%``) so the toggle stays inline-sized. */
+.inline-edit > button.inline-edit-toggle {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 6.5rem;
+  padding: 0 1rem;
+  border-left: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.inline-edit > button.inline-edit-toggle:hover {
+  background-color: var(--pico-secondary-hover-background);
+}
+
+.inline-edit > button.inline-edit-toggle--save {
+  background-color: #c6efb0;
+  color: #205107;
+}
+
+.inline-edit > button.inline-edit-toggle--save:hover {
+  background-color: #b1e596;
+}
+
+.inline-edit > button.inline-edit-toggle--cancel {
+  background-color: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+
+.inline-edit > button.inline-edit-toggle--cancel:hover {
+  background-color: var(--pico-secondary-hover-background);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .inline-edit > button.inline-edit-toggle--save {
+    background-color: #152b07;
+    color: #77ef3d;
+  }
+  :root:not([data-theme="light"]) .inline-edit > button.inline-edit-toggle--save:hover {
+    background-color: #1f3e0c;
+  }
+}
+
+[data-theme="dark"] .inline-edit > button.inline-edit-toggle--save {
+  background-color: #152b07;
+  color: #77ef3d;
+}
+[data-theme="dark"] .inline-edit > button.inline-edit-toggle--save:hover {
+  background-color: #1f3e0c;
+}

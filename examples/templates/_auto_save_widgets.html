@@ -1,0 +1,22 @@
+{# Per-field wrapper for the merged auto-save + submit button.
+
+   ``field.data`` carries an AutoSaveStatus(kind, message)
+   after a save attempt, or is falsy on the initial GET. The button
+   stays ``type="submit"`` regardless of state so it remains
+   clickable as the no-JS fallback and as a manual force-commit
+   shortcut in JS mode. The class encodes the kind for visual
+   styling. ``value`` repeats the label, the value the stock
+   ``SubmitInput`` widget would render, so a native submit and an
+   htmx request carry the same name/value pair. #}
+{%- set status = field.data if field.data and field.data.kind is defined else None -%}
+{%- set kind = status.kind if status else 'idle' -%}
+{%- set label = status.message if status else field.label.text -%}
+<button id="{{ field.id }}"
+        type="submit"
+        name="{{ field.name }}"
+        value="{{ field.label.text }}"
+        class="auto-save-status auto-save-status-{{ kind }}"
+        aria-live="polite"
+        {{ render_kw|xmlattr }}>
+  {{ label }}
+</button>

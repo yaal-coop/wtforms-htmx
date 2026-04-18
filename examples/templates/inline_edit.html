@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='inline_edit.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      <label class="inline-edit-label">Name</label>
+      {{ form.mode() }}
+    </div>
+  </form>
+{% endblock %}

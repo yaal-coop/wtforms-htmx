@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='markdown_preview.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      {{ form.content() }}
+      <div class="preview-pane">
+        <span class="preview-label">Preview</span>
+        <div id="preview" class="md-preview">{{ preview }}</div>
+      </div>
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

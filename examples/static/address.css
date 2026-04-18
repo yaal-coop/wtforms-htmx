@@ -1,0 +1,36 @@
+/* ------------------------------------------------------------------
+ * Address: screencast frame reservation
+ *
+ * The screencast toggles ``same_billing`` off and on; while it's off,
+ * the billing block is revealed below the delivery block, almost
+ * doubling the form height. ``sphinxcontrib-screencast`` crops to the
+ * locator bounding box measured at the end of the run, which lands on
+ * the collapsed state, so without a reserved minimum height the
+ * revealed billing block falls outside the captured frame.
+ * ------------------------------------------------------------------ */
+
+.demo-area {
+  min-height: 42rem;
+}
+
+/* ------------------------------------------------------------------
+ * Address: city loading affordance
+ *
+ * The city ``<select>`` carries its own ``hx-trigger`` (listening to
+ * the sibling postal_code input's keystrokes) and ``hx-post``, so it
+ * is the element that ISSUES the request, not just the one being
+ * swapped. htmx adds ``.htmx-request`` to it for the duration of the
+ * request, on htmx 2 and 4 alike, so plain CSS is enough. The second
+ * duration on the in-flight rule is the anti-flash delay: a fast
+ * response never dims the field.
+ * ------------------------------------------------------------------ */
+
+.address-city {
+  opacity: 1;
+  transition: opacity 120ms ease-in;
+}
+
+.address-city.htmx-request {
+  opacity: 0.5;
+  transition: opacity 120ms ease-in 200ms;
+}

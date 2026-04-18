@@ -1,0 +1,310 @@
+/* ------------------------------------------------------------------
+ * Attendance grid (Doodle-style cycling buttons)
+ * ------------------------------------------------------------------ */
+
+/* The screencast cycles the grid through a 4×5 mid-loop shape before
+   returning to the initial 3×4. The locator crop is measured at the
+   end (= initial), so the captured frame needs the larger shape's
+   footprint reserved up front to avoid clipping mid-cycle. */
+.demo-area {
+  min-height: 24rem;
+  min-width: 32rem;
+}
+
+.attendance-grid {
+  overflow-x: auto;
+}
+
+.attendance-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Pico defaults form-element buttons to ``width: 100%``; the toolbar
+   wants compact pill-style buttons. ``flex: 0 0 auto`` prevents the
+   flex container from stretching them either. */
+.attendance-toolbar > button.attendance-add {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 999px;
+}
+
+.attendance-rowheader,
+.attendance-colheader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* The row header doubles as an inline-edit on the user name. The
+   label span and the input share strictly the same box (width, height,
+   border-box sizing, padding) so the cell does not jump when the user
+   toggles between view and edit; the toggle button has its own
+   min-width so swapping between ``✏`` and ``✓`` doesn't shift the
+   boundary either. */
+.attendance-rowheader-label,
+.attendance-rowheader > input.attendance-rowheader-input {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: 5.5rem;
+  height: 1.5rem;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--pico-color);
+}
+
+.attendance-colheader-label {
+  white-space: nowrap;
+}
+
+.attendance-rowheader > input.attendance-rowheader-input {
+  margin: 0;
+  background: var(--pico-form-element-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+}
+
+.attendance-rowheader > input.attendance-rowheader-input:focus {
+  outline: none;
+  border-color: var(--pico-primary);
+  box-shadow: inset 0 0 0 1px var(--pico-primary);
+}
+
+/* Discreet edit/save toggle on each row header: same footprint as the
+   ``×`` rm button so the row header's geometry doesn't move when the
+   row flips into edit mode. */
+.attendance-rowheader > button.attendance-rowheader-toggle {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--pico-muted-color);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 999px;
+  opacity: 0.55;
+  transition: opacity 120ms ease, color 120ms ease, background-color 120ms ease;
+}
+
+.attendance-rowheader > button.attendance-rowheader-toggle:hover {
+  opacity: 1;
+  color: var(--pico-color);
+  background-color: var(--pico-secondary-background);
+}
+
+.attendance-rowheader > button.attendance-rowheader-toggle--save {
+  opacity: 1;
+  color: #205107;
+}
+
+.attendance-rowheader > button.attendance-rowheader-toggle--save:hover {
+  background-color: #c6efb0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .attendance-rowheader > button.attendance-rowheader-toggle--save {
+    color: #77ef3d;
+  }
+  :root:not([data-theme="light"]) .attendance-rowheader > button.attendance-rowheader-toggle--save:hover {
+    background-color: #152b07;
+  }
+}
+
+[data-theme="dark"] .attendance-rowheader > button.attendance-rowheader-toggle--save {
+  color: #77ef3d;
+}
+[data-theme="dark"] .attendance-rowheader > button.attendance-rowheader-toggle--save:hover {
+  background-color: #152b07;
+}
+
+/* Discreet × button: keep it out of the way visually, reveal red on
+   hover. Same shape regardless of row/column placement. */
+.attendance-rowheader > button.attendance-rm,
+.attendance-colheader > button.attendance-rm {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--pico-muted-color);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 999px;
+  opacity: 0.55;
+  transition: opacity 120ms ease, color 120ms ease, background-color 120ms ease;
+}
+
+.attendance-rowheader > button.attendance-rm:hover:not(:disabled),
+.attendance-colheader > button.attendance-rm:hover:not(:disabled) {
+  opacity: 1;
+  color: #861d13;
+  background-color: #f6cabf;
+}
+
+.attendance-rowheader > button.attendance-rm:disabled,
+.attendance-colheader > button.attendance-rm:disabled {
+  opacity: 0.15;
+  cursor: not-allowed;
+}
+
+.attendance-table {
+  width: auto;
+  border-collapse: separate;
+  border-spacing: 0.25rem;
+  margin: 0;
+}
+
+.attendance-table th {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--pico-muted-color);
+  padding: 0.25rem 0.5rem;
+  text-align: center;
+  background: transparent;
+  border: none;
+}
+
+.attendance-table tbody th[scope="row"] {
+  text-align: left;
+  color: var(--pico-color);
+}
+
+.attendance-table td {
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: center;
+}
+
+/* Pico defaults submit buttons to ``width: 100%``; the grid wants square
+   tap-targets sized by their td. Higher specificity (.attendance-table td
+   > button) overrides that without ``!important``. */
+.attendance-table td > button.attendance-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--pico-border-radius);
+  border: 1px solid transparent;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.attendance-button--empty {
+  background: transparent;
+  border-color: var(--pico-form-element-border-color);
+  border-style: dashed;
+  color: var(--pico-muted-color);
+}
+
+.attendance-button--empty:hover {
+  border-color: var(--pico-color);
+  color: var(--pico-color);
+}
+
+.attendance-button--present {
+  background-color: #c6efb0;
+  border-color: #33790f;
+  color: #205107;
+}
+
+.attendance-button--present:hover {
+  background-color: #b1e596;
+}
+
+.attendance-button--unknown {
+  background-color: #ffe7b3;
+  border-color: #876400;
+  color: #5b4200;
+}
+
+.attendance-button--unknown:hover {
+  background-color: #ffd98a;
+}
+
+.attendance-button--absent {
+  background-color: #f6cabf;
+  border-color: #c52f21;
+  color: #861d13;
+}
+
+.attendance-button--absent:hover {
+  background-color: #f0b3a4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .attendance-button--present {
+    background-color: #152b07;
+    border-color: #33790f;
+    color: #77ef3d;
+  }
+  :root:not([data-theme="light"]) .attendance-button--present:hover {
+    background-color: #1f3e0c;
+  }
+  :root:not([data-theme="light"]) .attendance-button--unknown {
+    background-color: #312302;
+    border-color: #876400;
+    color: #fecc63;
+  }
+  :root:not([data-theme="light"]) .attendance-button--unknown:hover {
+    background-color: #463405;
+  }
+  :root:not([data-theme="light"]) .attendance-button--absent {
+    background-color: #45150c;
+    border-color: #c52f21;
+    color: #f38f79;
+  }
+  :root:not([data-theme="light"]) .attendance-button--absent:hover {
+    background-color: #5a1c11;
+  }
+}
+
+[data-theme="dark"] .attendance-button--present {
+  background-color: #152b07;
+  border-color: #33790f;
+  color: #77ef3d;
+}
+[data-theme="dark"] .attendance-button--present:hover {
+  background-color: #1f3e0c;
+}
+[data-theme="dark"] .attendance-button--unknown {
+  background-color: #312302;
+  border-color: #876400;
+  color: #fecc63;
+}
+[data-theme="dark"] .attendance-button--unknown:hover {
+  background-color: #463405;
+}
+[data-theme="dark"] .attendance-button--absent {
+  background-color: #45150c;
+  border-color: #c52f21;
+  color: #f38f79;
+}
+[data-theme="dark"] .attendance-button--absent:hover {
+  background-color: #5a1c11;
+}

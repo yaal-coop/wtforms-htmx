@@ -1,0 +1,45 @@
+{# TaskListForm.tasks: TODO with append + per-row ↑ / ↓ / × + drag-to-reorder.
+
+   The wrapping ``<div id="tasks">`` carries the htmx attrs computed by
+   ``HtmxMeta.render_field`` (forwarded via ``kwargs|xmlattr``) so the
+   reorder swap targets this whole container. The ``<ul>`` carries
+   ``data-sortable-fieldlist`` + ``data-sortable-target=reorder`` for
+   ``sortable-fieldlist.js`` to bind Sortable.js on it; each ``<li>``
+   stores its current index in ``data-index`` so the bridge can build a
+   permutation string on drop. The ↑ / ↓ buttons reorder without
+   dragging, so they work without JavaScript and from the keyboard. #}
+{%- macro draggable_list(field) -%}
+  {%- set can_remove = field|length > field.min_entries -%}
+  <div id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    <ul data-sortable-fieldlist
+        data-sortable-target="{{ field._form.reorder.id }}">
+      {% for entry in field %}
+        {% set i = loop.index0 %}
+        {% set rm_kwargs = {"id": False, "class_": "outline", "aria_label": "Remove task " ~ (i + 1)} %}
+        {% if not can_remove %}{% set _ = rm_kwargs.update({"disabled": True}) %}{% endif %}
+        {% set up_kwargs = {"id": False, "class_": "outline secondary", "aria_label": "Move task " ~ (i + 1) ~ " up", "disabled": loop.first} %}
+        {% set down_kwargs = {"id": False, "class_": "outline secondary", "aria_label": "Move task " ~ (i + 1) ~ " down", "disabled": loop.last} %}
+        <li data-index="{{ i }}">
+          <span class="drag-handle"
+                aria-label="Drag to reorder"
+                title="Drag to reorder">
+            <svg viewBox="0 0 24 24" width="16" height="20" aria-hidden="true">
+              <circle cx="9" cy="6" r="1.6"/>
+              <circle cx="15" cy="6" r="1.6"/>
+              <circle cx="9" cy="12" r="1.6"/>
+              <circle cx="15" cy="12" r="1.6"/>
+              <circle cx="9" cy="18" r="1.6"/>
+              <circle cx="15" cy="18" r="1.6"/>
+            </svg>
+          </span>
+          <div role="group">
+            {{ entry.title.widget(entry.title) }}
+            {{ field._form.move_up(value=i, **up_kwargs) }}
+            {{ field._form.move_down(value=i, **down_kwargs) }}
+            {{ field._form.rm_task(value=i, **rm_kwargs) }}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{%- endmacro %}

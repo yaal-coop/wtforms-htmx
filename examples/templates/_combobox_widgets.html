@@ -1,0 +1,40 @@
+{# Combobox sub-widgets rendered as Jinja macros, no Python widgets.
+
+   ``listbox(field)`` renders the SelectField's options as a
+   ``<ul>`` of buttons. Each button carries the inner-form's htmx
+   submit attrs so picking fires the chained ``.triggers()``
+   declared on the SelectField (write to value, clear the query,
+   refresh the listbox itself).
+
+   ``chips(field)`` renders the SelectMultipleField's stored values
+   as chips. Each chip has a hidden input (so the value survives
+   formdata round-trips) and a ``×`` remove button bound to the
+   inner ``rm_country`` ButtonField via ``value_remove``.
+
+   Both macros take a trailing ``**kwargs`` so ``hx-swap-oob`` (set
+   by the OOB-target rendering path) flows through to the outer
+   element; without it htmx appends a new node instead of
+   replacing the existing one. #}
+
+{%- macro listbox(field) -%}
+  <ul role="listbox" id="{{ field.id }}" {{ kwargs|xmlattr }}>
+    {%- for opt in field -%}
+      {%- set attrs = dict(opt.choice.render_kw, **opt._form.htmx_submit_attrs(opt)) -%}
+      <li role="option" data-value="{{ opt.choice.value }}">
+        {{ opt(label=opt.choice.label, **attrs) }}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endmacro %}
+
+{%- macro chips(field) -%}
+  <div class="chips" id="{{ field.id }}" {{ kwargs|xmlattr }}>
+    {%- for opt in field -%}
+      <span class="chip" data-value="{{ opt.data }}">
+        <span class="chip-label">{{ opt.label.text }}</span>
+        {{ field._form.rm_country(value=opt.data, label="×", id=False, class_="chip-remove", aria_label="Remove " ~ opt.label.text) }}
+        <input type="hidden" name="{{ field.name }}" value="{{ opt.data }}">
+      </span>
+    {%- endfor -%}
+  </div>
+{%- endmacro %}

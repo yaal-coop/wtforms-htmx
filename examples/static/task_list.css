@@ -1,0 +1,13 @@
+/* ------------------------------------------------------------------
+ * Task list: screencast frame reservation
+ *
+ * The screencast adds a row (``+ Add task``) before removing it, so
+ * the mid-loop state is one row taller than the initial state. The
+ * locator crop is measured at the end (= initial), so without a
+ * minimum height the inserted row would render outside the captured
+ * frame.
+ * ------------------------------------------------------------------ */
+
+.demo-area {
+  min-height: 18rem;
+}

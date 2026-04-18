@@ -1,0 +1,10 @@
+/* The slug re-renders on each keystroke: freeze its green cue so it does
+   not flicker. */
+#slug[aria-invalid] {
+  transition: none;
+}
+
+#slug[aria-invalid="false"].htmx-request {
+  border-color: var(--pico-ins-color, #2e7d32);
+  background-image: var(--pico-icon-valid) !important;
+}

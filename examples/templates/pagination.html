@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='pagination.css') }}">
+{% endblock %}
+
+{% from "_pagination_widgets.html" import results_list %}
+
+{% block content %}
+  <form method="get">
+    <div class="demo-area">
+      {{ form.page() }}
+      {{ results_list(form) }}
+    </div>
+  </form>
+{% endblock %}

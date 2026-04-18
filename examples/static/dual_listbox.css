@@ -1,0 +1,281 @@
+/* ------------------------------------------------------------------
+ * Dual listbox: two-column shuttle with search, counters, avatars
+ * and bulk moves. The widget paints both panes in one swap; CSS
+ * keeps everything within Pico's tokens so the result composes
+ * with the rest of the example app's chrome.
+ * ------------------------------------------------------------------ */
+
+.dual-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  /* Snapshot the current page colors in custom properties: Pico
+     locally redefines both ``--pico-color`` (text) and
+     ``--pico-background-color`` on ``button[type="submit"]`` and on
+     ``button:hover`` to its primary palette (white-on-blue). Our
+     custom properties are NOT touched by Pico's button rules, so
+     descendants can read them to keep the page-level look on rows. */
+  --row-text-color: var(--pico-color);
+  --row-bg-color: var(--pico-background-color);
+  --row-bg-hover: color-mix(in srgb, var(--pico-primary-background) 8%, transparent);
+  --row-bg-selected: var(--pico-primary-background);
+  --row-text-selected: var(--pico-primary-inverse);
+  --avatar-size: 1.75rem;
+}
+
+@media (max-width: 720px) {
+  .dual-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----- Pane scaffolding ------------------------------------------------- */
+
+.dual-pane {
+  display: flex;
+  flex-direction: column;
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  overflow: hidden;
+  background: var(--pico-background-color);
+}
+
+.dual-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  background: var(--pico-card-background-color);
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.dual-header strong {
+  font-size: 0.85rem;
+  color: var(--pico-muted-color);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.dual-count {
+  min-width: 1.5rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ----- Search ----------------------------------------------------------- */
+
+.dual-search {
+  padding: 0.5rem 0.5rem 0.25rem 0.5rem;
+}
+
+.dual-search input[type="search"] {
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  /* Clear Pico's magnifier background-image. */
+  padding-inline-start: 2.5rem;
+  font-size: 0.875rem;
+  border-radius: var(--pico-border-radius);
+}
+
+/* Pico's default focus ring is large; the search input lives in a
+   narrow toolbar, so we trim the outline thickness to keep the
+   pane geometry stable on focus. */
+.dual-search input[type="search"]:focus {
+  outline-width: 1px;
+  outline-offset: 0;
+}
+
+/* The search inputs have no validators; they trigger partial swaps,
+   not validation rounds. ``_field.html`` still paints
+   ``aria-invalid="false"`` after each POST, which Pico turns into a
+   green border + a ✓ icon. Neutralize both. */
+.dual-search input[aria-invalid="false"],
+.dual-search input[aria-invalid="true"] {
+  border-color: var(--pico-form-element-border-color) !important;
+  background-image: none !important;
+}
+
+/* ----- Rows ------------------------------------------------------------- */
+
+.dual-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  min-height: 6rem;
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.dual-rows > li {
+  margin: 0;
+}
+
+.dual-empty {
+  display: block;
+  padding: 1rem 0.75rem;
+  color: var(--pico-muted-color);
+  font-style: italic;
+  text-align: center;
+}
+
+/* Higher specificity than Pico's ``button[type="submit"]`` so the
+   row buttons span the column width without losing the row look.
+   Pico paints buttons with ``primary-inverse`` (white) text by
+   default, so we force ``--pico-color`` and the label stays readable
+   on the pane background. */
+.dual-rows > li > button.dual-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 0;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: 0;
+  background: var(--row-bg-color);
+  color: var(--row-text-color);
+  text-align: left;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.dual-rows > li:last-child > button.dual-row {
+  border-bottom: 0;
+}
+
+.dual-rows > li > button.dual-row:hover {
+  background: var(--row-bg-hover);
+  color: var(--row-text-color);
+}
+
+.dual-rows > li > button.dual-row:focus-visible {
+  outline: 2px solid var(--pico-primary-focus);
+  outline-offset: -2px;
+}
+
+.dual-rows > li > button.dual-row.dual-row-selected {
+  background: var(--row-bg-selected);
+  color: var(--row-text-selected);
+}
+
+.dual-rows > li > button.dual-row.dual-row-selected:hover {
+  filter: brightness(0.95);
+}
+
+/* ----- Avatar ----------------------------------------------------------- */
+
+.dual-row .avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: white;
+  /* The gradient mixes the page primary with secondary so all
+     avatars share a coherent palette without per-initials hashing
+     (CSS can't hash strings; doing the hash server-side would
+     leak presentation into the model). */
+  background-image: linear-gradient(135deg,
+    var(--pico-primary) 0%,
+    color-mix(in srgb, var(--pico-primary) 60%, var(--pico-secondary)) 100%);
+}
+
+.dual-row.dual-row-selected .avatar {
+  background-image: linear-gradient(135deg,
+    color-mix(in srgb, var(--pico-primary-inverse) 30%, transparent) 0%,
+    color-mix(in srgb, var(--pico-primary-inverse) 15%, transparent) 100%);
+  color: var(--pico-primary-inverse);
+  border: 1px solid color-mix(in srgb, var(--pico-primary-inverse) 50%, transparent);
+}
+
+.dual-row .row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ----- Bulk footer ------------------------------------------------------ */
+
+.dual-bulk {
+  display: flex;
+  padding: 0.5rem;
+  border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+  background: var(--pico-card-background-color);
+}
+
+/* Quiet, secondary-style bulk buttons. Pico paints
+   ``button[type="submit"]`` with white-on-blue *by redefining
+   --pico-background-color locally*, so referencing that variable
+   from inside the button yields blue. We reuse ``--row-bg-color``
+   (captured at ``.dual-list`` scope, untouched by Pico) and add
+   ``--bulk-text`` for the same reason on the text side.
+   Selectors carry enough specificity (0,2,1) to win against
+   Pico's ``button[type="submit"]`` (0,1,1). */
+.dual-bulk > button.dual-bulk-button {
+  margin: 0;
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--row-bg-color);
+  color: var(--row-text-color);
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  cursor: pointer;
+  opacity: 0.85;
+  transition:
+    background-color 120ms ease-out,
+    border-color 120ms ease-out,
+    color 120ms ease-out,
+    opacity 120ms ease-out;
+}
+
+.dual-bulk > button.dual-bulk-button:hover {
+  background: var(--row-bg-hover);
+  border-color: var(--pico-primary-border);
+  color: var(--row-text-color);
+  opacity: 1;
+}
+
+.dual-bulk > button.dual-bulk-button:focus-visible {
+  outline: 2px solid var(--pico-primary-focus);
+  outline-offset: 1px;
+}
+
+.dual-bulk > button.dual-bulk-button.dual-bulk-button-danger:hover {
+  background: color-mix(in srgb, var(--pico-del-color, #c62828) 12%, transparent);
+  border-color: var(--pico-del-color, #c62828);
+  color: var(--pico-del-color, #c62828);
+}
+
+/* The two search inputs are rendered through the default
+   field-wrapper which prepends a ``<label>``; the column headers
+   plus the inputs' ``aria-label`` / ``placeholder`` already
+   identify them, so the wrapper label is noise. */
+.dual-search .field > label,
+.dual-search .field {
+  margin-bottom: 0;
+}
+
+.dual-search .field > label {
+  display: none;
+}

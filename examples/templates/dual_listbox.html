@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='dual_listbox.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {# First submit button in the form: the one the Enter key activates. #}
+    {{ form.save(id=False, class_="visually-hidden", tabindex="-1", aria_hidden="true") }}
+    <div class="demo-area">
+      {{ form.items() }}
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

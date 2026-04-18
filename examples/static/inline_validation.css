@@ -1,0 +1,16 @@
+/* ------------------------------------------------------------------
+ * Inline validation: screencast frame reservation
+ *
+ * The screencast cycles ``email`` between a valid and an invalid
+ * state, so the inline-validation error message pops in then out.
+ * ``sphinxcontrib-screencast`` crops to the locator bounding box
+ * measured at the end of the run, which is the no-error state, and
+ * smaller than mid-loop. Reserve the extra height here so the error
+ * sentence stays inside the captured crop. The demo area only
+ * contains the email field; name/website/age live outside the crop
+ * because they are not exercised by the scenario.
+ * ------------------------------------------------------------------ */
+
+.demo-area {
+  min-height: 7rem;
+}

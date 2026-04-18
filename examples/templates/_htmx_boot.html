@@ -1,0 +1,31 @@
+{# Single version-specific block of the example gallery. Everything else in
+   examples/ must render identically on htmx 2 and htmx 4 — see
+   docs/contributing.rst. #}
+{% if htmx_version == 2 %}
+  <script src="{{ url_for('static', filename='vendor/htmx2/htmx.min.js') }}"></script>
+  {# head-support extension: with hx-boost="true" only the body is
+     swapped; this extension merges the response <head> with the
+     current one so per-page <link>/<script> tags from
+     ``{% block extra_head %}`` actually load on boosted nav. #}
+  {% if htmx_boost %}
+    <script src="{{ url_for('static', filename='vendor/htmx2/head-support.js') }}"></script>
+  {% endif %}
+{% else %}
+  {# htmx 4.0.0 empties a focused input inside the swapped content while
+     settling (htmx#4056, fixed but unreleased). Remove once a release has it. #}
+  <meta name="htmx-config" content='{"defaultSettleDelay": 0}'>
+  <script src="{{ url_for('static', filename='vendor/htmx4/htmx.min.js') }}"></script>
+  {# hx-head extension: htmx 4's counterpart to head-support, merging
+     the response <head> into the current one on boosted nav. #}
+  {% if htmx_boost %}
+    <script src="{{ url_for('static', filename='vendor/htmx4/hx-head.js') }}"></script>
+  {% endif %}
+{% endif %}
+
+{% macro body_attrs(htmx_enabled, htmx_boost, htmx_version) -%}
+  {%- if htmx_enabled and htmx_boost and htmx_version == 2 %} hx-ext="head-support"{% endif -%}
+  {%- if htmx_boost %} {% if htmx_version == 2 %}hx-boost="true"{% else %}hx-boost:inherited="true"{% endif %}{% endif -%}
+  {#- Per-element opt-out from boost's default scroll-to-top; htmx 4 has no
+     scrollIntoViewOnBoost config key, so this is the only fix that works on both. #}
+  {%- if htmx_boost %} {% if htmx_version == 2 %}hx-swap="show:none"{% else %}hx-swap:inherited="show:none"{% endif %}{% endif -%}
+{%- endmacro %}

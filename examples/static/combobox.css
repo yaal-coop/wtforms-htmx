@@ -1,0 +1,150 @@
+.combobox-wrap {
+  position: relative;
+}
+
+/* The listbox is absolutely positioned, so it does not grow the
+   screencast crop: reserve room for the input plus one open option. */
+.combobox-wrap.demo-area {
+  min-height: 9rem;
+}
+
+.combobox {
+  position: relative;
+  margin-bottom: var(--pico-spacing);
+}
+
+/* No bottom margin on the group, so the listbox opens flush under
+   the field. The spacing below moves to ``.combobox``. */
+.combobox-search {
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+/* Chip-aware input frame: chips sit inline before the bare query
+   input, all inside the same visual border. The right side is
+   shaved so the frame visually joins the Search button. */
+.combobox-bar-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--pico-form-element-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-top-left-radius: var(--pico-border-radius);
+  border-bottom-left-radius: var(--pico-border-radius);
+  transition:
+    border-color var(--pico-transition),
+    box-shadow var(--pico-transition);
+}
+
+/* Chips wrapper is the htmx swap target, so keep it as an element
+   but make it transparent to layout so chips flow as flex siblings
+   of the input on the same line. */
+.combobox-bar-input > .chips {
+  display: contents;
+}
+
+/* Bare inner input: no border, no padding, no Pico-forced height
+   so it blends into the .combobox-bar-input frame. The attribute
+   selector is required: Pico's ``[role=group] input:not([type=...])``
+   sits at the same (0,2,1) specificity as our class+element rule
+   would, but with an extra attribute pin we tie and source-order
+   wins (our sheet loads after Pico). */
+.combobox-bar-input > input[type="text"] {
+  flex: 1 1 6rem;
+  min-width: 4rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  height: auto;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+.combobox-bar-input > input[type="text"]:focus {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+}
+
+/* The focus ring wraps the whole group, Search button included,
+   instead of the inner input. */
+.combobox-wrap:focus-within .combobox-bar-input {
+  border-color: var(--pico-primary-border);
+}
+
+.combobox-wrap:focus-within .combobox-search {
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus);
+}
+
+/* Pico inflates ``--pico-form-element-spacing-horizontal`` to 2rem
+   inside ``[role=group]`` and gives every direct child
+   ``flex: 1 1 auto``. Together that lets the Search button grow to
+   eat half the bar. Reset to a content-sized button so the chip-
+   aware input keeps the lion's share of the width. */
+.combobox-search > button[type="submit"] {
+  --pico-form-element-spacing-horizontal: 1.5rem;
+  flex: 0 0 auto;
+}
+
+.combobox [role="listbox"]:empty {
+  display: none;
+}
+
+.combobox [role="listbox"] {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--pico-form-element-border-color);
+  border-radius: 0 0 var(--pico-border-radius) var(--pico-border-radius);
+  background: var(--pico-card-background-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.combobox [role="option"] > button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  color: inherit;
+  cursor: pointer;
+  margin: 0;
+}
+
+.combobox [role="option"] > button:hover,
+.combobox [role="option"] > button:focus {
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  outline: none;
+}
+
+.combobox [role="option"] > button[disabled],
+.combobox [role="option"] > button[disabled]:hover,
+.combobox [role="option"] > button[disabled]:focus {
+  background: transparent;
+  color: var(--pico-muted-color);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.combobox [role="option"] > button[disabled]::before {
+  content: "✓\00a0";
+  color: var(--pico-primary);
+}
+
+.combobox-wrap:not(:focus-within) .combobox [role="listbox"] {
+  display: none;
+}

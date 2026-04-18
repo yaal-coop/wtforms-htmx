@@ -1,0 +1,140 @@
+/* ------------------------------------------------------------------
+ * Cycle button: one pill button rotating a hidden value
+ * ------------------------------------------------------------------ */
+
+.cycle-button-wrapper {
+  margin-bottom: 1rem;
+}
+
+/* Higher specificity than Pico's ``button[type="submit"]`` (which carries
+   ``width: 100%``) so the pill stays inline-sized. ``min-width`` pins the
+   width to the widest label of the cycle (``Priority: medium``) so the
+   button does not shimmy left/right as the state rotates. */
+.cycle-button-wrapper > button.cycle-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 14rem;
+  margin: 0;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease,
+              color 120ms ease;
+}
+
+.cycle-button--low {
+  background-color: #d6e9f8;
+  border-color: #4485c5;
+  color: #1d4d8c;
+}
+.cycle-button--low:hover {
+  background-color: #c2dcef;
+}
+
+.cycle-button--medium {
+  background-color: #c6efb0;
+  border-color: #33790f;
+  color: #205107;
+}
+.cycle-button--medium:hover {
+  background-color: #b1e596;
+}
+
+.cycle-button--high {
+  background-color: #ffe7b3;
+  border-color: #876400;
+  color: #5b4200;
+}
+.cycle-button--high:hover {
+  background-color: #ffd98a;
+}
+
+.cycle-button--critical {
+  background-color: #f6cabf;
+  border-color: #c52f21;
+  color: #861d13;
+}
+.cycle-button--critical:hover {
+  background-color: #f0b3a4;
+}
+
+.cycle-button--empty {
+  background-color: transparent;
+  border-color: var(--pico-form-element-border-color);
+  border-style: dashed;
+  color: var(--pico-muted-color);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .cycle-button--low {
+    background-color: #112237;
+    border-color: #4485c5;
+    color: #88bcec;
+  }
+  :root:not([data-theme="light"]) .cycle-button--low:hover {
+    background-color: #182f4c;
+  }
+  :root:not([data-theme="light"]) .cycle-button--medium {
+    background-color: #152b07;
+    border-color: #33790f;
+    color: #77ef3d;
+  }
+  :root:not([data-theme="light"]) .cycle-button--medium:hover {
+    background-color: #1f3e0c;
+  }
+  :root:not([data-theme="light"]) .cycle-button--high {
+    background-color: #312302;
+    border-color: #876400;
+    color: #fecc63;
+  }
+  :root:not([data-theme="light"]) .cycle-button--high:hover {
+    background-color: #463405;
+  }
+  :root:not([data-theme="light"]) .cycle-button--critical {
+    background-color: #45150c;
+    border-color: #c52f21;
+    color: #f38f79;
+  }
+  :root:not([data-theme="light"]) .cycle-button--critical:hover {
+    background-color: #5a1c11;
+  }
+}
+
+[data-theme="dark"] .cycle-button--low {
+  background-color: #112237;
+  border-color: #4485c5;
+  color: #88bcec;
+}
+[data-theme="dark"] .cycle-button--low:hover {
+  background-color: #182f4c;
+}
+[data-theme="dark"] .cycle-button--medium {
+  background-color: #152b07;
+  border-color: #33790f;
+  color: #77ef3d;
+}
+[data-theme="dark"] .cycle-button--medium:hover {
+  background-color: #1f3e0c;
+}
+[data-theme="dark"] .cycle-button--high {
+  background-color: #312302;
+  border-color: #876400;
+  color: #fecc63;
+}
+[data-theme="dark"] .cycle-button--high:hover {
+  background-color: #463405;
+}
+[data-theme="dark"] .cycle-button--critical {
+  background-color: #45150c;
+  border-color: #c52f21;
+  color: #f38f79;
+}
+[data-theme="dark"] .cycle-button--critical:hover {
+  background-color: #5a1c11;
+}

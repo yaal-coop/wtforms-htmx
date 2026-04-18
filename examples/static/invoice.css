@@ -1,0 +1,115 @@
+.invoice-table {
+  margin-bottom: 1rem;
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* All four numeric columns share the same narrow width so they feel
+   like a unit; the leftmost ``Item`` column takes the remaining space.
+   ``table-layout: fixed`` is what makes the ``<col width>`` directives
+   binding rather than mere hints. */
+.invoice-table col.num-col {
+  width: 7rem;
+}
+
+.invoice-table col.action-col {
+  width: 3.5rem;
+}
+
+.invoice-table th[scope="col"] {
+  white-space: nowrap;
+}
+
+/* ``vertical-align: top`` so that when one cell renders a validation
+   error block under its input, the inputs on the rest of the row stay
+   aligned with the now-taller cell's input rather than drifting to the
+   middle of its expanded height. Pico's default ``td`` padding gives
+   the row enough breathing room that, in the absence of errors, the
+   inputs still appear visually centered. */
+.invoice-table td,
+.invoice-table th {
+  vertical-align: top;
+  padding-top: var(--pico-spacing);
+  padding-bottom: var(--pico-spacing);
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.invoice-table td:first-child,
+.invoice-table th:first-child {
+  padding-left: 0;
+}
+
+.invoice-table td:last-child,
+.invoice-table th:last-child {
+  padding-right: 0;
+}
+
+.invoice-table .field {
+  margin-bottom: 0;
+}
+
+.invoice-table .field > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.invoice-table input {
+  margin-bottom: 0;
+}
+
+.invoice-table td.num input,
+.invoice-table tfoot input {
+  text-align: right;
+}
+
+/* Pico draws a green ✓ icon on ``aria-invalid="false"`` inputs; the
+   colored border alone is enough validation feedback inside the table,
+   and the icon competes visually with the right-aligned number. Keep
+   the border, drop the icon, and restore the default inline padding so
+   the number aligns flush with siblings that have no aria-invalid.
+   Pico's icon rule uses ``!important`` on ``padding-inline-end``, so
+   we must match that level to win. */
+.invoice-table input[aria-invalid="false"] {
+  background-image: none;
+  padding-inline-end: var(--pico-form-element-spacing-horizontal) !important;
+}
+
+.invoice-table .remove-cell {
+  width: 1px;
+  white-space: nowrap;
+}
+
+.invoice-table .remove-cell button {
+  margin: 0;
+}
+
+.invoice-table .add-cell {
+  text-align: right;
+}
+
+/* Match the ``×`` width (set by ``col.action-col``) so the two
+   form-level affordances line up visually as one button stack. */
+.invoice-table .add-cell button {
+  margin: 0;
+  width: 3.5rem;
+}
+
+.invoice-table tfoot th {
+  text-align: right;
+  font-weight: normal;
+  color: var(--pico-muted-color);
+}
+
+.invoice-table tfoot tr.grand-total th,
+.invoice-table tfoot tr.grand-total td input {
+  font-weight: bold;
+  color: var(--pico-color);
+}

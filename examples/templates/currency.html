@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='currency.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {# First submit button in the form: the one the Enter key activates. #}
+    {{ form.save(id=False, class_="visually-hidden", tabindex="-1", aria_hidden="true") }}
+    <div class="demo-area">
+      <div class="currency-row">
+        <div class="input-group">
+          {{ form.eur() }}
+          {{ form.convert_to_jpy(class_="secondary") }}
+        </div>
+        <div class="input-group">
+          {{ form.convert_to_eur(class_="secondary") }}
+          {{ form.jpy() }}
+        </div>
+      </div>
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

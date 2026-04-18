@@ -1,0 +1,15 @@
+{# CycleButtonForm.priority: visible button paired with a hidden input.
+   The wrapping ``<div id="priority">`` carries the htmx attrs computed
+   by ``HtmxMeta.render_field`` (forwarded via ``kwargs|xmlattr``) so the
+   ``cycle`` mutation swaps just this wrapper, re-rendering the button
+   with the new label and color class. #}
+{%- macro priority_cycle(field) -%}
+  {%- set value = field.data or "" -%}
+  <div id="{{ field.id }}" class="cycle-button-wrapper"{{ kwargs|xmlattr }}>
+    <input type="hidden" name="{{ field.name }}" value="{{ value }}">
+    {{ field._form.cycle(
+    label="Priority: " ~ (value or "—"),
+    id=False,
+    class_="cycle-button cycle-button--" ~ (value or "empty")) }}
+  </div>
+{%- endmacro %}

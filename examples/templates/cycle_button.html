@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='cycle_button.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      {{ form.priority() }}
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

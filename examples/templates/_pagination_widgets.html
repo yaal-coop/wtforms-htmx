@@ -1,0 +1,47 @@
+{# PaginationForm.page: the whole nav (Prev, numbered pages, Next)
+   rendered as buttons. ``opt.choice.render_kw`` carries per-option
+   ``disabled`` / ``aria-current`` / ``aria-label`` / ``class``; merge
+   it with the form's submit attrs so picking fires the SelectField's
+   chained triggers. Same pattern as the combobox listbox. #}
+
+{%- macro pagination_nav(field) -%}
+  <nav aria-label="Pagination" class="pagination" id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    {# ``role="list"`` opts out of the form-wide ``ul:not([role])``
+       stacking reset, and restores the list semantics that Safari
+       drops when ``list-style: none`` is set. #}
+    <ul role="list">
+      {%- for opt in field -%}
+        {%- set attrs = dict(opt.choice.render_kw, **opt._form.htmx_submit_attrs(opt)) -%}
+        {%- set _ = attrs.update({"hx-push-url": "true"}) -%}
+        <li>{{ opt(label=opt.choice.label, **attrs) }}</li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+{%- endmacro -%}
+
+
+{# Post listing for the current page. A plain DOM section (not a
+   field) targeted by selector, re-rendered via repaint_results on
+   every page change. #}
+
+{%- macro results_list(form) -%}
+  {%- set posts = form.current_posts() -%}
+  {%- set first, last, total = form.posts_range() -%}
+  <section class="pagination-results" id="results" aria-live="polite" aria-atomic="false">
+    <header class="pagination-results-header">
+      Showing <strong>{{ first }}</strong>–<strong>{{ last }}</strong>
+      of <strong>{{ total }}</strong> posts
+    </header>
+    <ul class="pagination-results-list" role="list">
+      {% for post in posts %}
+        <li class="pagination-result">
+          <span class="pagination-result-id">#{{ post.id }}</span>
+          <span class="pagination-result-title">{{ post.title }}</span>
+          <span class="pagination-result-meta">
+            {{ post.author }} · {{ post.date }}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{%- endmacro -%}

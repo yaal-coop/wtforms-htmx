@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='inline_validation.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      {{ form.email() }}
+    </div>
+    {{ form.name() }}
+    {{ form.website() }}
+    {{ form.age() }}
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

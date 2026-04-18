@@ -1,0 +1,123 @@
+{# DualListboxForm.items: two-column shuttle widget.
+
+   Click an Available row → it moves to Selected; click a Selected
+   row → it moves back. A single ``hx-target`` swap on the field's
+   wrapper repaints both columns and the live-region announcement.
+
+   Per-pane search inputs filter the visible rows server-side: each
+   keystroke re-renders the field, and ``form.visible_choices()``
+   applies the current queries. The header counters show the filtered
+   sizes, not the catalog size.
+
+   Bulk buttons ``Add all`` / ``Clear all`` operate on the filtered
+   subsets, the same data the user sees in each pane.
+#}
+
+{%- macro _initials(label) -%}
+  {%- set parts = label.split() -%}
+  {%- if parts | length >= 2 -%}
+    {{ (parts[0][0] ~ parts[-1][0]) | upper }}
+  {%- else -%}
+    {{ label[:2] | upper }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro _avatar_label(choice) -%}
+  <span class="avatar" data-initials="{{ _initials(choice.label) }}"
+        aria-hidden="true">{{ _initials(choice.label) }}</span>
+  <span class="row-name">{{ choice.label }}</span>
+{%- endmacro -%}
+
+{%- macro dual_listbox(field) -%}
+  {# ``kwargs`` carries the htmx attributes; they go on the swapped ``<div>``. #}
+  {%- set selected = field.data or [] -%}
+  {%- set form = field._form -%}
+  {%- set avail_q = form.available_query.data or "" -%}
+  {%- set sel_q = form.selected_query.data or "" -%}
+  {%- set available, selected_choices = form.visible_choices() -%}
+
+  <div class="dual-list" id="{{ field.id }}"{{ kwargs|xmlattr }}>
+    {%- for value in selected %}
+      <input type="hidden" name="{{ field.name }}" value="{{ value }}">
+    {%- endfor %}
+
+    <section class="dual-pane" aria-labelledby="{{ field.id }}-avail-title">
+      <header class="dual-header">
+        <strong id="{{ field.id }}-avail-title">Available</strong>
+        <span class="dual-count" aria-label="{{ available | length }} available">
+          {{ available | length }}
+        </span>
+      </header>
+      <div class="dual-search">
+        {{ form.available_query() }}
+      </div>
+      <ul class="dual-rows" role="list">
+        {%- for choice in available %}
+          <li>
+            {{ form.add_item(value=choice.value,
+            label=_avatar_label(choice),
+            id=False,
+            class_="dual-row dual-row-available",
+            aria_label="Add " ~ choice.label) }}
+          </li>
+        {%- else %}
+          <li><small class="dual-empty">
+            {%- if avail_q -%}
+              No match for "{{ avail_q }}".
+            {%- else -%}
+              No more candidates.
+            {%- endif -%}
+          </small></li>
+        {%- endfor %}
+      </ul>
+      <footer class="dual-bulk">
+        {{ form.add_all(class_="dual-bulk-button", id=False,
+        aria_label="Add all visible items") }}
+      </footer>
+    </section>
+
+    <section class="dual-pane" aria-labelledby="{{ field.id }}-sel-title">
+      <header class="dual-header">
+        <strong id="{{ field.id }}-sel-title">Selected</strong>
+        <span class="dual-count" aria-label="{{ selected_choices | length }} selected">
+          {{ selected_choices | length }}
+        </span>
+      </header>
+      <div class="dual-search">
+        {{ form.selected_query() }}
+      </div>
+      <ul class="dual-rows" role="list">
+        {%- for choice in selected_choices %}
+          <li>
+            {{ form.rm_item(value=choice.value,
+            label=_avatar_label(choice),
+            id=False,
+            class_="dual-row dual-row-selected",
+            aria_label="Remove " ~ choice.label) }}
+          </li>
+        {%- else %}
+          <li><small class="dual-empty">
+            {%- if sel_q -%}
+              No selected match for "{{ sel_q }}".
+            {%- elif selected -%}
+              No selected match in this filter.
+            {%- else -%}
+              No item selected yet.
+            {%- endif -%}
+          </small></li>
+        {%- endfor %}
+      </ul>
+      <footer class="dual-bulk">
+        {{ form.rm_all(class_="dual-bulk-button dual-bulk-button-danger", id=False,
+        aria_label="Remove all visible selected items") }}
+      </footer>
+    </section>
+
+    {# Live region: a re-render announces the new state to screen
+       readers without stealing focus. Polite politeness avoids
+       interrupting if the user is in the middle of another action. #}
+    <div class="visually-hidden" aria-live="polite" aria-atomic="true">
+      {{ available | length }} available, {{ selected_choices | length }} selected.
+    </div>
+  </div>
+{%- endmacro -%}

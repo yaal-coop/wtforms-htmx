@@ -1,0 +1,33 @@
+{# InvoiceForm.items: renders the table body. The ``<thead>``,
+   ``<tfoot>`` and form-level ``add_line`` button live in
+   ``invoice.html`` so the FieldList swap target stays the ``<tbody>``
+   only; re-rendering rows on add/remove doesn't disturb the totals,
+   which arrive as OOB swaps targeting their own ``<input>`` ids. #}
+{%- macro line_list(field) -%}
+  {%- set can_remove = field|length > field.min_entries -%}
+  <tbody id="{{ field.id }}">
+    {% for entry in field %}
+      {% set i = loop.index0 %}
+      {% set rm_kwargs = {"id": False, "class_": "outline secondary", "aria_label": "Remove line " ~ (i + 1)} %}
+      {% if not can_remove %}{% set _ = rm_kwargs.update({"disabled": True}) %}{% endif %}
+      {% set rm_html = field._form.rm_line(value=i, **rm_kwargs) %}
+      {{ entry(_remove_btn=rm_html) }}
+    {% endfor %}
+  </tbody>
+{%- endmacro %}
+
+{# A single invoice line as a table row. ``field.form.<x>()`` goes
+   through ``meta.field_wrapper`` so the htmx attrs on the total
+   wrapper are injected; bypassing it via ``field.widget`` directly
+   would skip the wiring. Labels inside the wraps are hidden via CSS
+   (the ``<th scope="col">`` in the table header is the real label). #}
+{%- macro line_entry(field, _remove_btn="") -%}
+  <tr>
+    <td>{{ field.form.name() }}</td>
+    <td class="num">{{ field.form.quantity() }}</td>
+    <td class="num">{{ field.form.unit_price() }}</td>
+    <td class="num">{{ field.form.vat_rate() }}</td>
+    <td class="num">{{ field.form.total() }}</td>
+    <td class="remove-cell">{{ _remove_btn }}</td>
+  </tr>
+{%- endmacro %}

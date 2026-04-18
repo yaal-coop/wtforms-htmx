@@ -1,0 +1,105 @@
+{# AttendanceForm.cells: dynamic Doodle-style grid.
+
+   Wrapping ``<div id="cells">`` carries the htmx attrs computed by
+   ``HtmxMeta.render_field`` (forwarded via ``kwargs|xmlattr``) so every
+   mutation (cycle, add/remove row/col, toggle_user) swaps the whole
+   grid. Each cell holds the entry's ``<input type="hidden">`` plus a
+   ``cycle`` button rendered with ``value=<entry-index>``; the cycle
+   mutation reads that index and rotates the entry's data through
+   ``CYCLE``. Rowheaders and colheaders also embed a discreet ``×``
+   (rm_user / rm_date) carrying their own ``value=<axis-index>``; the
+   toolbar above the table carries the ``Add user`` and ``Add date``
+   appenders.
+
+   The row header doubles as an inline-edit (view / edit) on the user
+   name. ``form.editing_user`` (a hidden field, mirrored as an
+   ``<input>`` in this wrapper so its value survives the swap) carries
+   the index of the row currently in edit mode, or ``""`` when none is.
+   The shared ``toggle_user`` button cycles the row between the two
+   states; the typed name lives in ``form.users.entries[u_idx]`` and is
+   read back by the view to sync ``state.users``. #}
+{%- macro attendance_grid(field) -%}
+  {%- set glyphs = {"": "—", "present": "✓", "unknown": "?", "absent": "✗"} -%}
+  {%- set n_dates = field.dates|length -%}
+  {%- set form = field._form -%}
+  {%- set n_users = form.users|length -%}
+  {%- set editing = form.editing_user.data or "" -%}
+  <div id="{{ field.id }}" class="attendance-grid"{{ kwargs|xmlattr }}>
+    <input type="hidden" name="{{ form.editing_user.name }}" value="{{ editing }}">
+    {# While a name is edited, Enter confirms it rather than adding a user. #}
+    {% if editing %}
+      {{ form.toggle_user(value=editing, id=False, class_="visually-hidden",
+      tabindex="-1", aria_hidden="true") }}
+    {% endif %}
+    <div class="attendance-toolbar">
+      {{ form.add_user(id=False, class_="attendance-add") }}
+      {{ form.add_date(id=False, class_="attendance-add") }}
+    </div>
+    <table class="attendance-table">
+      <thead>
+        <tr>
+          <th></th>
+          {% for d_idx in range(n_dates) %}
+            {% set rm = {"value": d_idx, "label": "×", "id": False,
+            "class_": "attendance-rm",
+            "aria_label": "Remove " ~ field.dates[d_idx].isoformat()} %}
+            {% if n_dates <= 1 %}{% set _ = rm.update({"disabled": True}) %}{% endif %}
+            <th scope="col">
+              <span class="attendance-colheader">
+                <span class="attendance-colheader-label">{{ field.dates[d_idx].strftime("%a %d %b") }}</span>
+                {{ form.rm_date(**rm) }}
+              </span>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for u_idx in range(n_users) %}
+          {%- set user_entry = form.users.entries[u_idx] -%}
+          {%- set user_name = user_entry.data or "" -%}
+          {%- set row_editing = editing == u_idx|string -%}
+          {% set rm = {"value": u_idx, "label": "×", "id": False,
+          "class_": "attendance-rm",
+          "aria_label": "Remove " ~ user_name} %}
+          {% if n_users <= 1 %}{% set _ = rm.update({"disabled": True}) %}{% endif %}
+          <tr>
+            <th scope="row">
+              <span class="attendance-rowheader">
+                {% if row_editing %}
+                  {{ user_entry.widget(user_entry, id=False,
+                  class_="attendance-rowheader-input",
+                  autofocus=True) }}
+                  {{ form.toggle_user(value=u_idx, label="✓", id=False,
+                  class_="attendance-rowheader-toggle attendance-rowheader-toggle--save",
+                  aria_label="Save name") }}
+                {% else %}
+                  <span class="attendance-rowheader-label">{{ user_name }}</span>
+                  <input type="hidden" name="{{ user_entry.name }}" value="{{ user_name }}">
+                  {{ form.toggle_user(value=u_idx, label="✏", id=False,
+                  class_="attendance-rowheader-toggle attendance-rowheader-toggle--edit",
+                  aria_label="Edit name") }}
+                {% endif %}
+                {{ form.rm_user(**rm) }}
+              </span>
+            </th>
+            {% for d_idx in range(n_dates) %}
+              {% set idx = u_idx * n_dates + d_idx %}
+              {% set entry = field.entries[idx] %}
+              {% set state = entry.data or "" %}
+              {% set bcls = "attendance-button attendance-button--" ~ (state or "empty") %}
+              {% set aria = "Toggle " ~ user_name ~ " on " ~ field.dates[d_idx].isoformat() %}
+              <td>
+                {{ entry() }}
+                {{ form.cycle(value=idx,
+                label=glyphs[state],
+                id=False,
+                class_=bcls,
+                aria_label=aria) }}
+              </td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{%- endmacro %}

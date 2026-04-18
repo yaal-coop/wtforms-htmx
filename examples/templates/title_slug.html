@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='title_slug.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    {{ form.last_auto_slug() }}
+    <div class="demo-area">
+      {{ form.title() }}
+      {{ form.slug() }}
+    </div>
+    {{ form.save(class_="save") }}
+  </form>
+{% endblock %}

@@ -1,0 +1,655 @@
+:root {
+  --pico-form-element-spacing-vertical: 0.5rem;
+  --pico-form-element-spacing-horizontal: 0.75rem;
+  /* Pico's sub-pixel border width renders unevenly: force a whole pixel. */
+  --pico-border-width: 1px;
+  --pico-outline-width: 2px;
+}
+
+/* ------------------------------------------------------------------
+ * Layout: sidebar + main
+ * ------------------------------------------------------------------ */
+
+body {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  min-height: 100vh;
+  margin: 0;
+}
+
+body > main {
+  padding: 2.5rem 3rem 4rem 3rem;
+  min-width: 0;
+}
+
+aside.examples {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 1.5rem 1rem;
+  background: var(--pico-card-background-color);
+  border-right: 1px solid var(--pico-card-border-color);
+}
+
+aside.examples nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+aside.examples nav h6 {
+  margin: 1rem 0 0.25rem 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pico-muted-color);
+}
+
+aside.examples nav a {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  color: var(--pico-color);
+}
+
+aside.examples nav a:hover {
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+
+aside.examples nav a[aria-current="page"] {
+  font-weight: 600;
+  color: var(--pico-primary-inverse);
+  background: var(--pico-primary-background);
+}
+
+aside.examples #htmx-toggle-form {
+  margin: 1.5rem 0 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--pico-card-border-color);
+}
+
+.htmx-switch {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.htmx-switch input[type="checkbox"] {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  body {
+    grid-template-columns: 1fr;
+  }
+
+  aside.examples {
+    position: static;
+    height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--pico-card-border-color);
+    padding: 1rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Cards / errors / utility
+ * ------------------------------------------------------------------ */
+
+article.example-card {
+  margin-bottom: 1rem;
+}
+
+article.example-card header {
+  margin-bottom: 0.25rem;
+}
+
+.errors {
+  list-style: none;
+  padding: 0;
+  margin: 0.35rem 0 0 0;
+  color: var(--pico-del-color, #c62828);
+  font-size: 0.875rem;
+}
+
+input:user-invalid,
+input[aria-invalid="true"] {
+  border-color: var(--pico-del-color, #c62828);
+}
+
+input[aria-invalid="false"] {
+  border-color: var(--pico-ins-color, #2e7d32);
+}
+
+/* A focused field hides its validity cue until the next blur. Pico sets the
+   cue with !important, hence !important here. */
+input[aria-invalid="true"]:focus,
+input[aria-invalid="false"]:focus {
+  border-color: var(--pico-primary-border);
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-primary-focus) !important;
+  background-image: none !important;
+}
+
+.field:has(input:focus) .errors,
+.field:has(input.htmx-request) .errors {
+  display: none;
+}
+
+/* In-flight validation after blur: the stale verdict is still in the
+   DOM until the swap lands, so neutralize it and red never flashes. */
+input[aria-invalid].htmx-request {
+  border-color: var(--pico-form-element-border-color);
+  background-image: none !important;
+}
+
+/* A swapped-in input has aria-invalid from the start: @starting-style gives
+   its border transition a starting color. */
+input[aria-invalid] {
+  transition: border-color 300ms ease-in;
+}
+
+@starting-style {
+  input[aria-invalid] {
+    border-color: var(--pico-form-element-border-color);
+  }
+}
+
+/* Beats Pico's input[type="submit"] (0,1,1) for the right-aligned variant. */
+input.save,
+button.save {
+  display: block;
+  width: auto;
+  min-width: 10rem;
+  margin-top: 1.5rem;
+  margin-left: auto;
+}
+
+/* Hidden, but still the submit button that Enter in a sibling input uses. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Spinner on the element that sent the request, delayed so fast responses
+   never show it. */
+@keyframes htmx-request-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Out of the flow, so the layout does not shift. */
+.field {
+  position: relative;
+}
+
+.field::after {
+  content: "";
+  position: absolute;
+  right: 0.75rem;
+  bottom: 1.8rem;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--pico-muted-color);
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease-out;
+}
+
+.field:has(input.htmx-request)::after {
+  opacity: 1;
+  animation: htmx-request-spin 0.6s linear infinite;
+  transition: opacity 100ms ease-out 200ms;
+}
+
+/* A swapped-in wrapper is already busy: @starting-style restarts the fade. */
+@starting-style {
+  .field:has(input.htmx-request)::after {
+    opacity: 0;
+  }
+}
+
+/* Same spinner on action buttons, in currentColor for every variant. */
+button[hx-post] {
+  position: relative;
+}
+
+button[hx-post]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.5rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease-out;
+}
+
+button[hx-post].htmx-request::after {
+  opacity: 0.7;
+  animation: htmx-request-spin 0.6s linear infinite;
+  transition: opacity 100ms ease-out 200ms;
+}
+
+/* Same swap-safety as the field spinner: a button re-inserted by a list
+   re-render must restart the delayed fade from zero. */
+@starting-style {
+  button[hx-post].htmx-request::after {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * FieldList partials: bullet-free vertical stack of entries
+ * ------------------------------------------------------------------ */
+
+main form ul:not([role]) {
+  list-style: none;
+  padding-left: 0;
+  margin: 0 0 0.75rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+main form ul:not([role]) > li {
+  margin: 0;
+  list-style: none;
+  padding: 0;
+}
+
+/* Row buttons sit at the end of their row, not below it. */
+main form ul:not([role]) > li input[type="submit"] {
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.9rem;
+  width: auto;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.controls input[type="submit"],
+.controls button {
+  margin: 0;
+  /* Pico defaults form-controls to ``width: 100%``; reset so they
+     pack horizontally in the flex container. */
+  width: auto;
+}
+
+/* Matches .controls input[type="submit"], so margin-left: auto pushes save
+   to the right. */
+.controls input.save,
+.controls button.save {
+  margin-top: 0;
+  margin-left: auto;
+}
+
+/* Shrink the group and push it right: margin-left: auto needs flex, not
+   Pico's inline-flex. */
+[role="group"].actions {
+  display: flex;
+  width: fit-content;
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------
+ * .input-group: an input and its buttons joined into one box. Pico's
+ * role="group" only styles direct children, not a wrapped field.
+ * ------------------------------------------------------------------ */
+
+.input-group {
+  display: flex;
+  align-items: end;
+  margin-bottom: var(--pico-spacing);
+}
+
+.input-group > .field {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.input-group > .field input,
+.input-group > button {
+  margin-bottom: 0;
+}
+
+/* Keep the button at its content size: Pico's width: 100% would make it
+   compete with the input. */
+.input-group > button {
+  flex: 0 0 auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+/* Square inner corners and one seam border, for a wrapped field or a button. */
+.input-group > :first-child :is(input, button),
+.input-group > :first-child:is(input, button) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.input-group > :last-child :is(input, button),
+.input-group > :last-child:is(input, button) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-width: 0;
+}
+
+.address-block,
+.address-narrow {
+  max-width: 28rem;
+}
+
+.address-block {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--pico-card-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-card-background-color);
+}
+
+.address-location {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+/* ------------------------------------------------------------------
+ * Chips: white-on-blue pills with a compact remove button
+ * ------------------------------------------------------------------ */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.1rem 0.1rem 0.1rem 0.55rem;
+  background: var(--pico-primary-background);
+  color: var(--pico-primary-inverse);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.chip-label {
+  white-space: nowrap;
+}
+
+/* Defeat Pico's submit-button width:100% so × stays a compact pill. */
+.chip > button.chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 100ms ease-out;
+}
+
+.chip > button.chip-remove:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Pico pulls non-first buttons of a ``role="group"`` 1px to the left. */
+[role="group"] .chip > button.chip-remove {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------
+ * Toast: fixed-position notification, adapted from µCSS (mucss.org)
+ * ------------------------------------------------------------------ */
+
+.alert {
+  position: relative;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: var(--pico-border-radius);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.alert p {
+  margin-bottom: 0;
+}
+
+.alert p + p {
+  margin-top: 0.5rem;
+}
+
+.alert-success {
+  color: #205107;
+  background-color: #c6efb0;
+  border-color: #77ef3d;
+}
+
+.alert-info {
+  color: #015050;
+  background-color: #b8f0ef;
+  border-color: #3decec;
+}
+
+.alert-warning {
+  color: #5b4200;
+  background-color: #ffe7b3;
+  border-color: #fecc63;
+}
+
+.alert-error {
+  color: #861d13;
+  background-color: #f6cabf;
+  border-color: #ee8b7d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .alert-success {
+    color: #77ef3d;
+    background-color: #152b07;
+    border-color: #33790f;
+  }
+
+  :root:not([data-theme="light"]) .alert-info {
+    color: #3decec;
+    background-color: #052b2b;
+    border-color: #047878;
+  }
+
+  :root:not([data-theme="light"]) .alert-warning {
+    color: #fecc63;
+    background-color: #312302;
+    border-color: #876400;
+  }
+
+  :root:not([data-theme="light"]) .alert-error {
+    color: #f38f79;
+    background-color: #45150c;
+    border-color: #c52f21;
+  }
+}
+
+[data-theme="dark"] .alert-success {
+  color: #77ef3d;
+  background-color: #152b07;
+  border-color: #33790f;
+}
+
+[data-theme="dark"] .alert-info {
+  color: #3decec;
+  background-color: #052b2b;
+  border-color: #047878;
+}
+
+[data-theme="dark"] .alert-warning {
+  color: #fecc63;
+  background-color: #312302;
+  border-color: #876400;
+}
+
+[data-theme="dark"] .alert-error {
+  color: #f38f79;
+  background-color: #45150c;
+  border-color: #c52f21;
+}
+
+.alert-dismissible {
+  padding-right: 3rem;
+}
+
+.alert-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.alert-close:hover {
+  opacity: 1;
+}
+
+.alert-close:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+  border-radius: var(--pico-border-radius);
+}
+
+.toast {
+  position: fixed;
+  z-index: 1050;
+  max-width: 350px;
+}
+
+.toast .alert {
+  margin-bottom: 0;
+}
+
+.toast-top-right { top: 1rem; right: 1rem; }
+.toast-top-left { top: 1rem; left: 1rem; }
+.toast-bottom-right { bottom: 1rem; right: 1rem; }
+.toast-bottom-left { bottom: 1rem; left: 1rem; }
+.toast-top-center { top: 1rem; left: 50%; transform: translateX(-50%); }
+.toast-bottom-center { bottom: 1rem; left: 50%; transform: translateX(-50%); }
+
+@media (max-width: 639px) {
+  .toast {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+    transform: none;
+  }
+}
+
+/* ------------------------------------------------------------------
+ * Sortable FieldList: drag handle + ghost / chosen / drag visuals
+ * ------------------------------------------------------------------ */
+
+[data-sortable-fieldlist] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+[data-sortable-fieldlist] > li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+[data-sortable-fieldlist] > li > [role="group"] {
+  margin-bottom: 0;
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 2.5rem;
+  color: var(--pico-muted-color);
+  cursor: grab;
+  user-select: none;
+  border-radius: var(--pico-border-radius);
+  flex-shrink: 0;
+}
+
+.drag-handle svg {
+  fill: currentColor;
+}
+
+.drag-handle:hover {
+  color: var(--pico-color);
+  background: var(--pico-secondary-background);
+}
+
+.drag-handle:active,
+.sortable-chosen .drag-handle {
+  cursor: grabbing;
+}
+
+.sortable-ghost {
+  opacity: 0.35;
+  background: var(--pico-secondary-background);
+}
+
+.sortable-chosen {
+  background: var(--pico-card-background-color);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.15);
+  border-radius: var(--pico-border-radius);
+}
+
+.sortable-drag {
+  opacity: 0.9;
+  cursor: grabbing;
+}

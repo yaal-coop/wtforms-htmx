@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <hgroup>
+    <h1>wtforms-htmx</h1>
+    <p>A small gallery demonstrating the pieces of the library.</p>
+  </hgroup>
+
+  <section>
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.attendance') }}">Attendance grid</a></h3>
+      </header>
+      <p>
+        Doodle-style 2D availability grid: rows (users) and columns
+        (dates) can be added or removed at runtime, each cell cycles
+        through (present → unknown → absent) on click. Six custom
+        mutations on a flat <code>FieldList</code>; the form is never
+        validated or saved. Every click is a pure state
+        transition.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.auto_save') }}">Auto-save</a></h3>
+      </header>
+      <p>
+        The save button listens to every field with
+        <code>.triggered_by("*", on="input delay:800ms")</code> and
+        commits the form on every typing pause. The whole form must
+        validate; otherwise a status pill reports the error count and
+        the underlying state stays untouched. Manual submit button kept
+        for the no-JS fallback.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.combobox') }}">Combobox</a></h3>
+      </header>
+      <p>
+        Single-text-entry picker backed by a server-filtered popup
+        listbox. The query input refreshes the suggestions as the user
+        types; clicking a suggestion fires
+        <code>value_add</code> through <code>.triggers()</code>, the
+        chip's <code>×</code> runs <code>value_remove</code>.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.currency') }}">Currency converter</a></h3>
+      </header>
+      <p>
+        EUR ⇆ JPY bidirectional converter. Typing in either field
+        updates the other without moving the caret. Companion
+        <code>→ JPY</code> / <code>← EUR</code> buttons run the same
+        mutations on click, with or without JavaScript.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.cycle_button') }}">Cycle button</a></h3>
+      </header>
+      <p>
+        One button that rotates a hidden value through a fixed list
+        on every click, with the built-in
+        <code>cycle_through(values)</code> mutation on a
+        <code>HiddenField</code>. Same recipe as the cells in the
+        attendance grid, distilled to a single value.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.datalist') }}">Datalist autocomplete</a></h3>
+      </header>
+      <p>
+        A single <code>StringField</code> with a callable
+        <code>DataList</code> filtered server-side. Typing refreshes
+        the <code>&lt;datalist&gt;</code> options, with no custom
+        JavaScript and a browser-native suggestion popup.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.dual_listbox') }}">Dual listbox</a></h3>
+      </header>
+      <p>
+        Two-column shuttle on a <code>SelectMultipleField</code>:
+        <em>Available</em> ↔ <em>Selected</em>. Layers live
+        per-column search (via <code>StringField.triggers</code>),
+        header counters, <em>Add all</em> / <em>Clear all</em>
+        bulk moves that honor the active filter, avatars on each
+        row, and an <code>aria-live</code> region, all on top of
+        the same <code>value_add</code> / <code>value_remove</code>
+        wiring as the tag picker. References: Ant Transfer, SLDS
+        Dueling Picklist, Bootstrap Italia Transfer.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.address') }}">Dynamic address form</a></h3>
+      </header>
+      <p>
+        Delivery + billing blocks with an opt-in copy. Country drives
+        a server-side postal code → city + region lookup; the billing
+        block is conditionally revealed and pre-filled. Combines
+        <code>FormField</code> nesting, datalists, and cross-field
+        triggers.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.faceted_search') }}">Faceted search</a></h3>
+      </header>
+      <p>
+        Catalog-of-books search with chips for active filters,
+        an inline panel for the five facets, and a result list
+        that updates on every change. The <em>Author</em>
+        autocomplete reads the values of its sibling facets
+        (genre, language, year range) and tightens its suggestions
+        accordingly, the cascade that defines faceted search.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.inline_edit') }}">Inline edit</a></h3>
+      </header>
+      <p>
+        A read-only label paired with an edit button. Click
+        <code>✏ Edit</code> to flip into edit mode (input editable,
+        button becomes <code>✓ Save</code>); click <code>✓ Save</code>
+        to commit and revert to read-only. Same
+        <code>cycle_through</code> recipe as the cycle button, on
+        two values driving the wrapper's rendered UI.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.inline_validation') }}">Inline validation</a></h3>
+      </header>
+      <p>
+        A settings-like form revalidated on <code>blur</code>. Showcases
+        WTForms' native <code>Email</code>, <code>URL</code>,
+        <code>NumberRange</code> and <code>Length</code> validators.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.invoice') }}">Invoice totals</a></h3>
+      </header>
+      <p>
+        Per-row VAT-aware totals declared inside a nested
+        <code>FormField</code>. Add / remove lines, live row total,
+        invoice-level subtotal / VAT / grand total recomputed as
+        the user types, via out-of-band swaps.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.markdown_preview') }}">Markdown preview</a></h3>
+      </header>
+      <p>
+        A textarea drives a server-rendered markdown preview into a
+        <code>&lt;div&gt;</code> that is <em>not</em> a form field.
+        Uses the htmx selector syntax in
+        <code>.triggers("#preview", …)</code>; mistune renders the
+        markdown on each typing pause.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.pagination') }}">Pagination</a></h3>
+      </header>
+      <p>
+        Page-by-page navigation built from a single
+        <code>SelectField</code>: each numbered page <em>and</em> the
+        <code>←</code> / <code>→</code> arrows are options rendered
+        as buttons via <code>option_widget=Button()</code>. Clicking
+        any of them binds the new page naturally. Prev/Next need no
+        custom mutation, their target page is computed at render
+        time.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.password') }}">Password strength indicator</a></h3>
+      </header>
+      <p>
+        Live-scored password meter plus a confirmation field.
+        Typing recomputes the strength via a
+        custom mutation; the <code>EqualTo</code> validator gates
+        the matching status next to the confirm input.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.tag_picker') }}">Tag picker</a></h3>
+      </header>
+      <p>
+        Chip picker on a <code>SelectMultipleField</code>: selected
+        values appear as chips, the unselected ones as a catalog
+        strip of buttons. <code>value_add</code> and
+        <code>value_remove</code> wire the add / remove buttons
+        without a custom mutation.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.task_list') }}">Task list</a></h3>
+      </header>
+      <p>
+        A draggable TODO list: append, remove, move up or down, and
+        drag-to-reorder on a <code>FieldList(FormField)</code>. Combines
+        <code>list_add</code>, <code>list_remove</code>,
+        <code>list_move</code> and <code>list_reorder</code>; per-row
+        validation and form-level save in the same submit cycle.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
+        <h3><a href="{{ url_for('main.title_slug') }}">Title slug</a></h3>
+      </header>
+      <p>
+        A title input derives a slug field. Typing normalizes the
+        title to ASCII / kebab-case on the fly, until the user edits
+        the slug by hand.
+      </p>
+    </article>
+
+  </section>
+
+{% endblock %}

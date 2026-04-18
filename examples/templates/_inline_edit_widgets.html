@@ -1,0 +1,41 @@
+{# InlineEditForm.mode: branches the rendered UI on the current
+   value of ``mode``:
+
+   * ``view``: read-only ``<span>`` + ``✏ Edit`` button.
+   * ``edit``: editable ``<input>`` + ``✓ Save`` + ``✕ Cancel``.
+
+   The wrapping ``<div id="mode">`` carries the htmx attrs computed
+   by ``HtmxMeta.render_field`` (forwarded via ``kwargs|xmlattr``) so
+   the cycle / restore mutations swap just this wrapper.
+
+   ``name`` is declared with ``wrapper=False``: the meta
+   ``field_wrapper``'s own ``<div id="wrap-name">`` + label would nest
+   inside the inline-edit pill and break the flex layout.
+
+   In view mode the ``name`` field is re-injected as a hidden input
+   so its value survives any swap the user may trigger from outside
+   the wrapper. #}
+
+{%- macro inline_edit(field) -%}
+  {%- set mode = field.data or "view" -%}
+  {%- set form = field._form -%}
+  {%- set value = form.name.data or "" -%}
+  <div id="{{ field.id }}" class="inline-edit"{{ kwargs|xmlattr }}>
+    <input type="hidden" name="{{ field.name }}" value="{{ mode }}">
+    {% if mode == "edit" %}
+      {{ form.name(class_="inline-edit-input", autofocus=True) }}
+      {{ form.save(id=False, label="✓ Save",
+      class_="inline-edit-toggle inline-edit-toggle--save",
+      aria_label="Save name") }}
+      {{ form.cancel(id=False, label="✕ Cancel",
+      class_="inline-edit-toggle inline-edit-toggle--cancel",
+      aria_label="Cancel edit") }}
+    {% else %}
+      <span class="inline-edit-value">{{ value }}</span>
+      <input type="hidden" name="{{ form.name.name }}" value="{{ value }}">
+      {{ form.edit(id=False, label="✏ Edit",
+      class_="inline-edit-toggle inline-edit-toggle--edit",
+      aria_label="Edit name") }}
+    {% endif %}
+  </div>
+{%- endmacro %}
