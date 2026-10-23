@@ -2053,6 +2053,7 @@ e2e = [
     { name = "pycountry" },
     { name = "pytest" },
     { name = "pytest-playwright" },
+    { name = "pytest-xdist" },
 ]
 example = [
     { name = "email-validator" },
@@ -2100,6 +2101,7 @@ e2e = [
     { name = "pycountry", specifier = ">=24" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-playwright", specifier = ">=0.5" },
+    { name = "pytest-xdist", specifier = ">=3.8.0" },
 ]
 example = [
     { name = "email-validator", specifier = ">=2" },

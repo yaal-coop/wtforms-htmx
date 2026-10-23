@@ -74,6 +74,7 @@ e2e = [
     { include-group = "example" },
     "pytest>=8.0",
     "pytest-playwright>=0.5",
+    "pytest-xdist>=3.8.0",
 ]
 
 # tests/e2e needs pytest-playwright and is run explicitly (tox -e e2e, the e2e

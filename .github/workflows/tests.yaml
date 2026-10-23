@@ -114,10 +114,8 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Install dependencies
         run: uv sync --group e2e
-      - name: Install Chromium
-        run: uv run --no-sync playwright install --with-deps chromium
       - name: Run tests
-        run: uv run --no-sync pytest tests/e2e --browser chromium --htmx-version "$HTMX_VERSION"
+        run: uv run --no-sync pytest tests/e2e --browser chromium --browser-channel chrome --htmx-version "$HTMX_VERSION" -n auto
         env:
           HTMX_VERSION: ${{ matrix.htmx }}
           PYTEST_ADDOPTS: ${{ matrix.args }}
@@ -161,12 +159,12 @@ jobs:
       - name: Install dependencies
         run: uv sync --group doc --group example
       - name: Install Chromium
-        run: uv run --no-sync playwright install --with-deps chromium
+        run: uv run --no-sync playwright install chromium
       - name: Install ffmpeg
         run: sudo apt-get install --yes --no-install-recommends ffmpeg
       - name: Build the documentation
         run: |
-          uv run --no-sync sphinx-build -b dirhtml docs build/sphinx/html -w sphinx-warnings.log
+          uv run --no-sync sphinx-build -j auto -b dirhtml docs build/sphinx/html -w sphinx-warnings.log
           # sphinxcontrib-screenshot declares screenshot_default_locator_padding
           # as int but accepts the CSS-shorthand string we pass, emitting one
           # warning that cannot be suppressed. Fail on any other warning.
