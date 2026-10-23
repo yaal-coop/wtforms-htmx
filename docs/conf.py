@@ -40,6 +40,7 @@ screenshot_apps = {"examples": "_app:create_app"}
 mermaid_config = {"sequence": {"mirrorActors": False}}
 
 screenshot_default_locator_padding = "5 10 5 10"
+screenshot_default_color_scheme = "auto"
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
@@ -81,6 +82,7 @@ exclude_patterns = ["_build"]
 html_theme = "flask"
 html_theme_options = {"index_sidebar_logo": False}
 html_static_path = ["_static"]
+html_css_files = ["color-scheme.css"]
 html_logo = "_static/logo.webp"
 html_favicon = "_static/favicon.svg"
 
@@ -101,7 +103,7 @@ html_show_sourcelink = False
 
 # Screencast aliases also written as animated WebP: GitHub renders those in the
 # README, and drops <video> tags.
-animated_screencasts = ["title-slug"]
+animated_screencasts = ["title-slug-light", "title-slug-dark"]
 
 
 def _write_animated_screencasts(app, exception):

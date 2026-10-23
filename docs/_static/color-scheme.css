@@ -1,0 +1,19 @@
+/* The theme has no dark mode: show the light captures even when the OS is
+   dark, and the dark ones only when Dark Reader darkens the page. */
+@media (prefers-color-scheme: dark) {
+    .only-light {
+        display: revert;
+    }
+
+    .only-dark {
+        display: none;
+    }
+}
+
+html[data-darkreader-scheme="dark"] .only-light {
+    display: none;
+}
+
+html[data-darkreader-scheme="dark"] .only-dark {
+    display: revert;
+}

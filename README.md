@@ -9,7 +9,10 @@ Python and powered by [htmx](https://htmx.org/), with no JavaScript to
 write, or even any htmx.
 
 <p align="center">
-  <img src="https://wtforms-htmx.readthedocs.io/en/latest/_static/screencasts/title-slug.webp" width="700" alt="Typing a title fills in its slug as you type.">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://wtforms-htmx.readthedocs.io/en/latest/_static/screencasts/title-slug-dark.webp">
+    <img src="https://wtforms-htmx.readthedocs.io/en/latest/_static/screencasts/title-slug-light.webp" width="700" alt="Typing a title fills in its slug as you type.">
+  </picture>
 </p>
 
 Here's (almost) everything wtforms-htmx adds on top of a regular form:
