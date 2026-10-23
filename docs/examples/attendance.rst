@@ -22,14 +22,14 @@ slices contiguous as the flat list mutates.
     from datetime import date, timedelta
     from wtforms import ButtonField, FieldList, HiddenField, StringField
     from wtforms_htmx import HtmxForm
-    from wtforms_htmx.mutations import cycle_through
+    from wtforms_htmx.mutations import value_cycle
 
     CYCLE = ["present", "unknown", "absent"]
 
 
     def cycle_cell(values):
         """Mutation: rotate the clicked entry of a FieldList through ``values``."""
-        cycle = cycle_through(values)
+        cycle = value_cycle(values)
 
         def _mutation(form, source, target):
             idx = int(source.raw_data[0])

@@ -46,7 +46,7 @@ The mutations here are all custom (none of the shipped
 mutations matches this 2D-grid shape):
 
 - ``cycle_cell(values)``: apply
-  :func:`~wtforms_htmx.mutations.cycle_through` to the clicked entry.
+  :func:`~wtforms_htmx.mutations.value_cycle` to the clicked entry.
   An empty cell moves to the first value.
 - ``add_row`` / ``remove_row``: add or remove a user row.
 - ``add_col`` / ``remove_col``: add or remove a date column.
@@ -79,7 +79,7 @@ from wtforms import FieldList
 from wtforms import HiddenField
 from wtforms import StringField
 
-from wtforms_htmx.mutations import cycle_through
+from wtforms_htmx.mutations import value_cycle
 
 from . import bp
 from ._shared import _INITIAL_STATE
@@ -145,7 +145,7 @@ def _index_from(source: Any, default: int | None = None) -> int | None:
 
 def cycle_cell(values: list[str]) -> Callable[[Any, Any, Any], None]:
     """Return a mutation that cycles the clicked cell through ``values``."""
-    cycle = cycle_through(values)
+    cycle = value_cycle(values)
 
     def _mutation(form: Any, source: Any, target: Any) -> None:
         _check_cells(target, "cycle_cell")

@@ -20,7 +20,7 @@ Setup
     from wtforms import ButtonField, HiddenField, StringField, SubmitField
     from wtforms.widgets import Button
     from wtforms_htmx import HtmxForm
-    from wtforms_htmx.mutations import cycle_through
+    from wtforms_htmx.mutations import value_cycle
 
     MODES = ["view", "edit"]
 
@@ -38,7 +38,7 @@ Setup
         cancel = ButtonField("✕ Cancel")
 
         # Edit switches to edit mode.
-        edit.triggers("mode", cycle_through(MODES))
+        edit.triggers("mode", value_cycle(MODES))
 
         # Cancel, or Escape in the input, restores the saved name.
         cancel.triggers("mode", restore)

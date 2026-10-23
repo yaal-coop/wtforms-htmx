@@ -43,7 +43,7 @@ from wtforms import ButtonField
 from wtforms import HiddenField
 from wtforms import SubmitField
 
-from wtforms_htmx.mutations import cycle_through
+from wtforms_htmx.mutations import value_cycle
 
 from . import bp
 from ._shared import _INITIAL_STATE
@@ -74,7 +74,7 @@ class CycleButtonForm(ExampleForm):
     save = SubmitField("Save")
 
     # Each click moves the priority to the next value.
-    cycle.triggers("priority", cycle_through(PRIORITIES))
+    cycle.triggers("priority", value_cycle(PRIORITIES))
 
 
 @bp.route("/cycle-button", methods=["GET", "POST"])

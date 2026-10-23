@@ -15,7 +15,7 @@ button at the bottom.
 The mutations all cooperate on a single ``mode``
 :class:`~wtforms.fields.HiddenField`:
 
-* :func:`~wtforms_htmx.mutations.cycle_through` on ``[view, edit]``
+* :func:`~wtforms_htmx.mutations.value_cycle` on ``[view, edit]``
   drives the ``✏ Edit`` button (one-way: from view, the only
   reachable state is edit).
 * A restore callback flips ``mode`` back to ``view``
@@ -92,7 +92,7 @@ from wtforms import StringField
 from wtforms import SubmitField
 from wtforms.widgets import Button
 
-from wtforms_htmx.mutations import cycle_through
+from wtforms_htmx.mutations import value_cycle
 
 from . import bp
 from ._shared import _INITIAL_STATE
@@ -134,7 +134,7 @@ class InlineEditForm(ExampleForm):
     cancel = ButtonField("✕ Cancel")
 
     # Edit switches to edit mode.
-    edit.triggers("mode", cycle_through(MODES))
+    edit.triggers("mode", value_cycle(MODES))
 
     # Cancel, or Escape in the input, restores the saved name.
     cancel.triggers("mode", _restore)

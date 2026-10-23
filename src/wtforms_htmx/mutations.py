@@ -1,7 +1,7 @@
 """Built-in callbacks for trigger declarations.
 
 Each callback takes ``(form, source, target)``. ``value_set``,
-``cycle_through`` and ``list_move`` build such a callback. The ones for a
+``value_cycle`` and ``list_move`` build such a callback. The ones for a
 SelectMultipleField or a FieldList raise TypeError on another target type.
 """
 
@@ -76,7 +76,7 @@ def value_set(value: Any) -> Callable[[Any, Any, Any], None]:
     return _mutation
 
 
-def cycle_through(values: list[Any]) -> Callable[[Any, Any, Any], None]:
+def value_cycle(values: list[Any]) -> Callable[[Any, Any, Any], None]:
     """Return a mutation that rotates ``target.data`` through ``values``.
 
     Each firing advances ``target.data`` to the next entry, wrapping around
@@ -85,14 +85,16 @@ def cycle_through(values: list[Any]) -> Callable[[Any, Any, Any], None]:
 
     Use it with a single :class:`~wtforms.fields.ButtonField` for status
     toggles, view/edit modes or step indicators. No value is read from
-    the source.
+    the source. Raise :exc:`ValueError` when ``values`` is empty.
 
     Cycle a status field from one button::
 
         STATES = ["todo", "doing", "done"]
         status = SelectField(choices=STATES)
-        cycle = ButtonField("·").triggers("status", cycle_through(STATES))
+        cycle = ButtonField("·").triggers("status", value_cycle(STATES))
     """
+    if not values:
+        raise ValueError("value_cycle() needs at least one value")
 
     def _mutation(form: Any, _source: Any, target: Any) -> None:
         current = target.data or ""

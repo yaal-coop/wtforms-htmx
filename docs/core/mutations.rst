@@ -20,7 +20,7 @@ Assign ``target.data`` of a single-valued field (string, select).
 
 .. autofunction:: value_set
 
-.. autofunction:: cycle_through
+.. autofunction:: value_cycle
 
 Multi-select mutations
 ----------------------

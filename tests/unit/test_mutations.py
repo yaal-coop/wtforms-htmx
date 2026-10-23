@@ -14,13 +14,13 @@ from wtforms import SelectChoice
 from wtforms import SelectMultipleField
 from wtforms import StringField
 
-from wtforms_htmx.mutations import cycle_through
 from wtforms_htmx.mutations import list_add
 from wtforms_htmx.mutations import list_clear
 from wtforms_htmx.mutations import list_move
 from wtforms_htmx.mutations import list_remove
 from wtforms_htmx.mutations import list_reorder
 from wtforms_htmx.mutations import value_add
+from wtforms_htmx.mutations import value_cycle
 from wtforms_htmx.mutations import value_remove
 from wtforms_htmx.mutations import value_set
 
@@ -243,13 +243,19 @@ def test_value_set_overwrites_the_data():
     ("current", "expected"),
     [("todo", "doing"), ("done", "todo"), (None, "todo"), ("ghost", "todo")],
 )
-def test_cycle_through_advances_to_the_next_value(current, expected):
-    """``cycle_through`` moves to the next value, and restarts from the first one."""
+def test_value_cycle_advances_to_the_next_value(current, expected):
+    """``value_cycle`` moves to the next value, and restarts from the first one."""
     form = _ListForm()
     target = StringField().bind(form, "status")
     target.data = current
-    cycle_through(["todo", "doing", "done"])(form, _Source(), target)
+    value_cycle(["todo", "doing", "done"])(form, _Source(), target)
     assert target.data == expected
+
+
+def test_value_cycle_rejects_an_empty_list():
+    """``value_cycle([])`` raises at declaration, not at the first click."""
+    with pytest.raises(ValueError, match="at least one value"):
+        value_cycle([])
 
 
 def test_list_clear_numbers_new_entries_from_zero():

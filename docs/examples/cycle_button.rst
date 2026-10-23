@@ -2,20 +2,20 @@ Cycle button
 ============
 
 A single button rotates a hidden value through a fixed list on every
-click, built on :func:`~wtforms_htmx.mutations.cycle_through`.
+click, built on :func:`~wtforms_htmx.mutations.value_cycle`.
 
 .. automodule:: examples.cycle_button
    :no-members:
    :no-index:
 
-:func:`~wtforms_htmx.mutations.cycle_through` moves ``priority`` to the
+:func:`~wtforms_htmx.mutations.value_cycle` moves ``priority`` to the
 next value of the list on each click. The button needs no ``value``.
 
 .. code-block:: python
 
     from wtforms import ButtonField, HiddenField, SubmitField
     from wtforms_htmx import HtmxForm
-    from wtforms_htmx.mutations import cycle_through
+    from wtforms_htmx.mutations import value_cycle
 
     PRIORITIES = ["low", "medium", "high", "critical"]
 
@@ -25,7 +25,7 @@ next value of the list on each click. The button needs no ``value``.
         cycle = ButtonField("·")
         save = SubmitField("Save")
 
-        cycle.triggers("priority", cycle_through(PRIORITIES))
+        cycle.triggers("priority", value_cycle(PRIORITIES))
 
 ``render_priority`` renders a Jinja macro: the visible button next to
 the ``<input type="hidden">``. The wrapper carries the htmx attributes
