@@ -192,7 +192,7 @@ Installation
 
     $ uv add wtforms-htmx
 
-wtforms-htmx requires WTForms 3.3.0b4 or later. It does not ship htmx. Load it yourself, from a CDN or from
+wtforms-htmx requires WTForms 3.3 or later. It does not ship htmx. Load it yourself, from a CDN or from
 your static files. It works with htmx 2 and htmx 4, with no extension.
 This documentation and the examples use htmx 4.
 

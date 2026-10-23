@@ -41,11 +41,11 @@ in a helper, so only the helper changes later.
 2. Upgrade to WTForms 3.3
 -------------------------
 
-wtforms-htmx requires WTForms 3.3.0b4 or later:
+wtforms-htmx requires WTForms 3.3 or later:
 
 .. code-block:: console
 
-    $ uv add "wtforms>=3.3.0b4"
+    $ uv add "wtforms>=3.3"
 
 Run the tests. Nothing else changes yet.
 
