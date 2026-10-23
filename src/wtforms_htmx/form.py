@@ -273,6 +273,8 @@ class HtmxFormMixin:
 
     if TYPE_CHECKING:
         meta: HtmxMeta
+        _fields: dict[str, Field]
+        _parent_form: HtmxFormMixin | None
         _htmx_mutation: _HtmxMutation | None
 
     def __init__(self, *args, headers=None, **kwargs):
@@ -344,7 +346,7 @@ class HtmxFormMixin:
             self._htmx_triggers_wired = True
             # The helpers record the qualified ``holder.name``, which dispatch
             # needs inside a sub-form.
-            for holder in self._fields.values():  # type: ignore[attr-defined]
+            for holder in self._fields.values():
                 _collect_triggers(holder, self)
                 _collect_triggered_by(holder, self)
 
@@ -365,7 +367,7 @@ class HtmxFormMixin:
         ``change``. The declaration is replaced each time, so a renumbered row
         keeps its id.
         """
-        for holder in _inline_validation_fields(self._fields.values()):  # type: ignore[attr-defined]
+        for holder in _inline_validation_fields(self._fields.values()):
             if (
                 _is_submit_source(holder)
                 or _state(holder, "_htmx_selector_target") is not None
@@ -576,7 +578,7 @@ class HtmxFormMixin:
         if not self.meta.csrf or self._htmx_formdata is None:
             return True
 
-        return self[self.meta.csrf_field_name].validate(self)
+        return self._fields[self.meta.csrf_field_name].validate(self)
 
     def _dispatch_button(self, mutation: _HtmxMutation) -> None:
         """Run the callbacks of the button that submitted the form."""
