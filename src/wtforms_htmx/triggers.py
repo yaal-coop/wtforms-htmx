@@ -2,14 +2,21 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 from typing import NamedTuple
-from typing import TYPE_CHECKING
+from typing import TypeAlias
 
 from wtforms.fields.core import UnboundField
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
+TriggerCallback: TypeAlias = Callable[[Any, Any, Any], Any]
+"""A ``(form, source, target) -> result`` callback of a trigger declaration.
+
+``form`` is the form that holds the declaring field. ``source`` is the
+field that fired, or ``None`` for the ``"*"`` wildcard. ``target`` is a
+field, or the selector string of a DOM target. See :ref:`callback-return`
+for the ``result``.
+"""
 
 
 class _TriggerEntry(NamedTuple):
@@ -21,7 +28,7 @@ class _TriggerEntry(NamedTuple):
     ``None`` defers to the form-wide ``htmx_default_trigger``.
     """
 
-    callback: Callable[..., Any] | None = None
+    callback: TriggerCallback | None = None
     """Optional ``(form, source, target) -> result`` callback.
 
     ``None`` means a plain re-render.
@@ -30,7 +37,7 @@ class _TriggerEntry(NamedTuple):
 
 def _normalize_trigger_args(
     target: str | list[str],
-    callback: Callable[..., Any] | None,
+    callback: TriggerCallback | None,
     on: str | None,
     *,
     method_name: str,
@@ -81,7 +88,13 @@ def _normalize_trigger_args(
     return dict.fromkeys(names, _TriggerEntry(event=on, callback=callback))
 
 
-def _unbound_triggers(self, target, callback=None, *, on=None):
+def _unbound_triggers(
+    self,
+    target: str | list[str],
+    callback: TriggerCallback | None = None,
+    *,
+    on: str | None = None,
+):
     """Declare what an event on this field re-renders, optionally running a callback first.
 
     Each call adds (or refines) one or more of this field's trigger
@@ -131,7 +144,13 @@ def _unbound_triggers(self, target, callback=None, *, on=None):
     return self
 
 
-def _unbound_triggered_by(self, source, callback=None, *, on=None):
+def _unbound_triggered_by(
+    self,
+    source: str | list[str],
+    callback: TriggerCallback | None = None,
+    *,
+    on: str | None = None,
+):
     """Declare which field events re-render this field, optionally running a callback first.
 
     Symmetric to :meth:`.triggers() <wtforms.fields.core.UnboundField.triggers>`:

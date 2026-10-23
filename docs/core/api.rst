@@ -24,6 +24,9 @@ See :doc:`overview` to wire it in.
 .. autoclass:: HtmxResponse
     :members:
 
+.. autodata:: TriggerCallback
+    :no-value:
+
 .. _attribute-precedence:
 
 Attribute precedence

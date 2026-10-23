@@ -7,11 +7,12 @@ SelectMultipleField or a FieldList raise TypeError on another target type.
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from typing import Any
 
 from wtforms.fields import FieldList
 from wtforms.fields import SelectMultipleField
+
+from .triggers import TriggerCallback
 
 
 def _entry_is_padding(entry: Any) -> bool:
@@ -60,7 +61,7 @@ def _source_index(source: Any) -> int | None:
         return None
 
 
-def value_set(value: Any) -> Callable[[Any, Any, Any], None]:
+def value_set(value: Any) -> TriggerCallback:
     """Return a mutation that overwrites ``target.data`` with ``value``.
 
     Use it to clear a field (``value_set("")`` / ``value_set(None)``) or
@@ -76,7 +77,7 @@ def value_set(value: Any) -> Callable[[Any, Any, Any], None]:
     return _mutation
 
 
-def value_cycle(values: list[Any]) -> Callable[[Any, Any, Any], None]:
+def value_cycle(values: list[Any]) -> TriggerCallback:
     """Return a mutation that rotates ``target.data`` through ``values``.
 
     Each firing advances ``target.data`` to the next entry, wrapping around
@@ -262,7 +263,7 @@ def list_reorder(form: Any, source: Any, target: Any) -> None:
     _rebuild_in_order(target, order)
 
 
-def list_move(offset: int) -> Callable[[Any, Any, Any], None]:
+def list_move(offset: int) -> TriggerCallback:
     """Return a mutation that moves a :class:`~wtforms.fields.FieldList` entry by ``offset``.
 
     The entry index is read from the source's value. ``-1`` moves the
