@@ -7,9 +7,9 @@ wtforms-htmx
    :align: center
    :alt: wtforms-htmx
 
-Build interactive forms with :external+wtforms:doc:`WTForms <index>`
-and `htmx <https://htmx.org/>`_, without writing JavaScript, or even
-any htmx.
+Interactive :external+wtforms:doc:`WTForms <index>` forms declared in
+Python and powered by `htmx <https://htmx.org/>`_, with no JavaScript to
+write, or even any htmx.
 
 .. screencast:: |examples|/title-slug
    :locator: .demo-area
