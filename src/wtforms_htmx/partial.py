@@ -7,9 +7,7 @@ from copy import copy
 from dataclasses import dataclass
 from dataclasses import field
 from html.parser import HTMLParser
-from types import MappingProxyType
 from typing import Any
-from typing import NamedTuple
 from typing import TYPE_CHECKING
 
 from markupsafe import Markup
@@ -22,11 +20,8 @@ if TYPE_CHECKING:
     from .form import HtmxFormMixin
 
 
-# Read-only, so the shared NamedTuple default cannot be mutated.
-_NO_HEADERS: Mapping[str, str] = MappingProxyType({})
-
-
-class HtmxResponse(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class HtmxResponse:
     """An htmx partial response.
 
     Pairs the body to return with any htmx response headers the
@@ -36,7 +31,7 @@ class HtmxResponse(NamedTuple):
     body: str
     """The rendered HTML fragment to send back to the client."""
 
-    headers: Mapping[str, str] = _NO_HEADERS
+    headers: Mapping[str, str] = field(default_factory=dict)
     """htmx response headers the library computed for this response.
 
     The library sets :htmx-header:`hx-retarget` (when the fragment's

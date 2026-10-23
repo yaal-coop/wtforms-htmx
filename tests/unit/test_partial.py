@@ -19,6 +19,7 @@ from wtforms.validators import Length
 from wtforms.validators import Regexp
 
 from wtforms_htmx import HtmxForm
+from wtforms_htmx import HtmxResponse
 from wtforms_htmx.mutations import list_add
 from wtforms_htmx.mutations import list_remove
 from wtforms_htmx.mutations import value_set
@@ -158,7 +159,7 @@ def test_inline_validation_returns_the_field():
         MultiDict({"email": "alice@example.com", "name": "Alice"}),
         headers=htmx_headers("email", "email"),
     )
-    assert form.partial() == (
+    assert form.partial() == HtmxResponse(
         '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
         ' hx-trigger="blur changed" id="email" name="email" required type="text"'
         ' value="alice@example.com">',
@@ -267,7 +268,7 @@ def test_list_button_returns_the_list_alone():
         headers=htmx_headers("add_tag", "tags"),
     )
     attrs = 'hx-include="closest form" hx-post="" hx-swap="outerHTML" hx-trigger="blur changed"'
-    assert form.partial() == (
+    assert form.partial() == HtmxResponse(
         '<ul id="tags"><li><label for="tags-0">Tags-0</label>'
         f' <input {attrs} id="tags-0" name="tags-0" type="text" value="a"></li>'
         '<li><label for="tags-1">Tags-1</label>'
@@ -320,7 +321,7 @@ def test_selector_callback_markup_is_the_body():
     form = _PreviewForm(
         MultiDict({"content": "hello"}), headers=htmx_headers("content", "preview")
     )
-    assert form.partial() == ('<div id="preview">hello</div>', {})
+    assert form.partial() == HtmxResponse('<div id="preview">hello</div>', {})
 
 
 def test_selector_callback_returning_none_swaps_nothing():
@@ -330,7 +331,7 @@ def test_selector_callback_returning_none_swaps_nothing():
         content = StringField().triggers("#preview", lambda form, source, target: None)
 
     form = _Form(MultiDict({"content": "x"}), headers=htmx_headers("content"))
-    assert form.partial() == ("", {"HX-Reswap": "none"})
+    assert form.partial() == HtmxResponse("", {"HX-Reswap": "none"})
 
 
 def test_selector_without_callback_swaps_nothing():
@@ -340,7 +341,7 @@ def test_selector_without_callback_swaps_nothing():
         content = StringField().triggers("#preview")
 
     form = _Form(MultiDict({"content": "x"}), headers=htmx_headers("content"))
-    assert form.partial() == ("", {"HX-Reswap": "none"})
+    assert form.partial() == HtmxResponse("", {"HX-Reswap": "none"})
 
 
 def test_selector_callback_str_is_one_fragment():
@@ -446,7 +447,9 @@ def test_listener_callback_markup_replaces_the_target_render():
         )
 
     form = _Form(MultiDict({"src": "x"}), headers=htmx_headers("dst"))
-    assert form.partial() == ('<span id="dst">custom</span>', {"HX-Retarget": "#dst"})
+    assert form.partial() == HtmxResponse(
+        '<span id="dst">custom</span>', {"HX-Retarget": "#dst"}
+    )
 
 
 def test_listener_callback_field_replaces_the_target():
@@ -566,7 +569,7 @@ def test_button_selector_without_callback_swaps_nothing():
         ping = ButtonField("p").triggers("#out")
 
     form = _Form(MultiDict({"ping": ""}), headers=htmx_headers("ping"))
-    assert form.partial() == ("", {"HX-Reswap": "none"})
+    assert form.partial() == HtmxResponse("", {"HX-Reswap": "none"})
 
 
 def test_button_selector_callback_markup_is_the_body():
@@ -579,7 +582,7 @@ def test_button_selector_callback_markup_is_the_body():
         )
 
     form = _Form(MultiDict({"save": ""}), headers={"HX-Request": "true"})
-    assert form.partial() == (
+    assert form.partial() == HtmxResponse(
         '<div id="preview">rendered</div>',
         {"HX-Retarget": "#preview"},
     )
