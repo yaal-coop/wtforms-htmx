@@ -17,6 +17,10 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     name: py${{ matrix.python }} unit tests
@@ -44,6 +48,7 @@ jobs:
         run: uv run --group test pytest --showlocals
 
   coverage:
+    name: coverage
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -112,9 +117,13 @@ jobs:
       - name: Install Chromium
         run: uv run --no-sync playwright install --with-deps chromium
       - name: Run tests
-        run: uv run --no-sync pytest tests/e2e --browser chromium --htmx-version ${{ matrix.htmx }} ${{ matrix.args }}
+        run: uv run --no-sync pytest tests/e2e --browser chromium --htmx-version "$HTMX_VERSION"
+        env:
+          HTMX_VERSION: ${{ matrix.htmx }}
+          PYTEST_ADDOPTS: ${{ matrix.args }}
 
   style:
+    name: style checks
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -130,6 +139,7 @@ jobs:
         run: uv run --group dev prek run --all-files --show-diff-on-failure
 
   doc:
+    name: documentation
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -167,6 +177,7 @@ jobs:
           fi
 
   all-checks:
+    name: all-checks
     if: always()
     needs: [tests, coverage, minversions, e2e, style, doc]
     runs-on: ubuntu-24.04
