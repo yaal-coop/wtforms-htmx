@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="docs/_static/logo.webp" alt="wtforms-htmx">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/_static/logo-dark.webp">
+    <img src="docs/_static/logo.webp" alt="wtforms-htmx">
+  </picture>
 </p>
 
 # wtforms-htmx
