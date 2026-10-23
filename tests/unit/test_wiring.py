@@ -133,12 +133,15 @@ def test_triggers_and_triggered_by_render_the_same_html():
 
 @pytest.mark.parametrize("source", ["nope", "#preview"])
 def test_triggered_by_ignores_a_source_that_is_not_a_field(source):
-    """A source that matches no field wires nothing, without warning."""
+    """A source that matches no field wires nothing and warns."""
 
     class _Form(HtmxForm):
         dst = StringField().triggered_by(source)
 
-    assert attr(_Form().dst(), "hx-trigger") == "blur changed"
+    with pytest.warns(UserWarning, match="matches no field"):
+        form = _Form()
+
+    assert attr(form.dst(), "hx-trigger") == "blur changed"
 
 
 def test_self_trigger_keeps_the_links_declared_after_it():

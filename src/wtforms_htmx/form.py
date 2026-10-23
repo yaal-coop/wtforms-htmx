@@ -228,7 +228,7 @@ def _collect_triggered_by(holder: Any, form: Any) -> None:
     """Record ``holder.triggered_by(...)`` declarations in ``holder._htmx_trigger_sources``.
 
     The wildcard is kept as ``("*", "*", entry)``. Its callback gets
-    ``source=None``.
+    ``source=None``. Warn about a source that matches no field.
     """
     triggered_by = _state(holder, "_htmx_triggered_by")
     if not triggered_by:
@@ -241,8 +241,15 @@ def _collect_triggered_by(holder: Any, form: Any) -> None:
             continue
 
         kind, val = _classify_target(form, root, source_name)
-        if kind == "field":
-            _add_trigger_source(holder, val.id, val.name, entry)
+        if kind != "field":
+            warnings.warn(
+                f"{holder.name!r} is triggered by {source_name!r}, which matches "
+                "no field. The declaration is ignored. Check the field name.",
+                stacklevel=2,
+            )
+            continue
+
+        _add_trigger_source(holder, val.id, val.name, entry)
 
 
 class HtmxFormMixin:

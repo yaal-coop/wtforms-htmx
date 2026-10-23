@@ -146,8 +146,8 @@ def _unbound_triggered_by(self, source, callback=None, *, on=None):
 
     Unlike :meth:`triggers <wtforms.fields.core.UnboundField.triggers>`,
     ``triggered_by`` does *not* accept DOM selectors: the source must be
-    a real field of the form. A string that matches none is silently
-    ignored.
+    a real field of the form. A string that matches none emits a
+    :exc:`UserWarning`, and the declaration is ignored.
 
     .. code-block:: python
 
