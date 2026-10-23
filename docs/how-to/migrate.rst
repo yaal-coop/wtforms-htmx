@@ -27,7 +27,7 @@ Look for:
 - Buttons written in templates, including the ones outside the
   :mdn-tag:`form` that use the :mdn-attr:`button#form` attribute.
 - Forms built at runtime with :class:`~wtforms.form.BaseForm`. Build
-  them as classes instead, for example with :func:`type`. The rest of
+  them as classes instead, for example with :class:`type`. The rest of
   this guide uses :class:`~wtforms.form.Form` subclasses.
 - Code that already reads htmx headers. wtforms-htmx reads them from
   step 5 on.

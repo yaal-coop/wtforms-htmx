@@ -167,7 +167,7 @@ CSRF protection
 ~~~~~~~~~~~~~~~
 
 Callbacks run while the form is built, before
-:meth:`~wtforms.Form.validate`. With CSRF protection on
+:meth:`~wtforms.form.Form.validate`. With CSRF protection on
 (:attr:`Meta.csrf <wtforms.meta.DefaultMeta.csrf>`), the form checks the
 token first. With an invalid token, no callback runs and the error is
 set on the CSRF field. The view can then answer as it does for any CSRF

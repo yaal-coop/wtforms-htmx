@@ -185,7 +185,7 @@ Mutations dispatch at construction so the view stays terse, but a form
 class can opt out with
 :attr:`Meta.htmx_auto_mutate <wtforms_htmx.HtmxMeta.htmx_auto_mutate>`
 ``= False``, for a test that inspects the form *before* mutations apply,
-or a view that needs to interleave business logic between :meth:`~wtforms.form.Form.process`
+or a view that needs to interleave business logic between :meth:`~wtforms.form.BaseForm.process`
 and the mutation step. The view then calls
 :meth:`~wtforms_htmx.HtmxFormMixin.mutate` itself. The view's no-JS
 gate (see :doc:`/how-to/mutations`) reads
