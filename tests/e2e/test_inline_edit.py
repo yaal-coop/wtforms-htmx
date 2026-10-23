@@ -50,6 +50,7 @@ def test_inline_edit_escape_restores(page, open_example):
     """Escape in the input drops the typed name, like Cancel."""
     open_example("Inline edit")
     page.get_by_role("button", name="Edit name").click()
+    expect(page.locator(".inline-edit-input")).to_be_focused()
 
     page.locator(".inline-edit-input").fill("Trashed draft")
     page.locator(".inline-edit-input").press("Escape")
