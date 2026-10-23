@@ -10,6 +10,8 @@ build:
   # `playwright install --with-deps` is not an option: the OS dependencies are
   # installed as apt packages and only the browser binary is fetched below.
   apt_packages:
+    # Writes the animated WebP of the README screencast.
+    - ffmpeg
     - libasound2t64
     - libatk-bridge2.0-0t64
     - libatk1.0-0t64

@@ -9,7 +9,7 @@ and [htmx](https://htmx.org/), without writing JavaScript, or even any
 htmx.
 
 <p align="center">
-  <video src="https://wtforms-htmx.readthedocs.io/en/latest/_static/screencasts/title-slug.webm" width="700" autoplay loop muted playsinline controls></video>
+  <img src="https://wtforms-htmx.readthedocs.io/en/latest/_static/screencasts/title-slug.webp" width="700" alt="Typing a title fills in its slug as you type.">
 </p>
 
 Here's (almost) everything wtforms-htmx adds on top of a regular form:

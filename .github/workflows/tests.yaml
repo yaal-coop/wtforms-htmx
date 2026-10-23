@@ -152,6 +152,8 @@ jobs:
         run: uv sync --group doc --group example
       - name: Install Chromium
         run: uv run --no-sync playwright install --with-deps chromium
+      - name: Install ffmpeg
+        run: sudo apt-get install --yes --no-install-recommends ffmpeg
       - name: Build the documentation
         run: |
           uv run --no-sync sphinx-build -b dirhtml docs build/sphinx/html -w sphinx-warnings.log

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import shutil
+import subprocess
 import sys
 from importlib.metadata import version as _version
 from pathlib import Path
 from wsgiref.simple_server import WSGIRequestHandler
 
 from pallets_sphinx_themes import ProjectLink
+from sphinx.util import logging
 
 # Make ``_app`` importable by ``screenshot_apps`` below.
 sys.path.insert(0, str(Path().resolve()))
@@ -95,3 +98,56 @@ html_sidebars = {
     "**": ["home.html", "localtoc.html", "relations.html", "searchbox.html"],
 }
 html_show_sourcelink = False
+
+# Screencast aliases also written as animated WebP: GitHub renders those in the
+# README, and drops <video> tags.
+animated_screencasts = ["title-slug"]
+
+
+def _write_animated_screencasts(app, exception):
+    if exception is not None or app.builder.format != "html":
+        return
+
+    folder = Path(app.outdir) / "_static" / "screencasts"
+    for name in animated_screencasts:
+        source = folder / f"{name}.webm"
+        target = folder / f"{name}.webp"
+        if not source.exists():
+            continue
+
+        if target.exists() and target.stat().st_mtime >= source.stat().st_mtime:
+            continue
+
+        if (ffmpeg := shutil.which("ffmpeg")) is None:
+            logging.getLogger(__name__).warning(
+                "ffmpeg not found, %s.webp is not written", name
+            )
+            return
+
+        subprocess.run(
+            [
+                ffmpeg,
+                "-v",
+                "error",
+                "-y",
+                "-i",
+                source,
+                "-vf",
+                "fps=15",
+                "-c:v",
+                "libwebp_anim",
+                "-loop",
+                "0",
+                "-lossless",
+                "1",
+                "-compression_level",
+                "6",
+                "-an",
+                target,
+            ],
+            check=True,
+        )
+
+
+def setup(app):
+    app.connect("build-finished", _write_animated_screencasts)
