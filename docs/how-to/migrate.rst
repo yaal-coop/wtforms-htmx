@@ -31,6 +31,17 @@ Look for:
   this guide uses :class:`~wtforms.form.Form` subclasses.
 - Code that already reads htmx headers. wtforms-htmx reads them from
   step 5 on.
+- Forms that set an attribute after ``super().__init__()``, when a
+  validator or a callback reads it. Set it before: wtforms-htmx
+  validates the form and runs the callbacks inside
+  ``super().__init__()``.
+
+  .. code-block:: python
+
+      class SubscriberForm(Form):
+          def __init__(self, *args, subscriber_id=None, **kwargs):
+              self.subscriber_id = subscriber_id
+              super().__init__(*args, **kwargs)
 
 Then check that the tests submit forms through the rendered HTML, for
 example with WebTest's :meth:`form.submit() <webtest.forms.Form.submit>`.
@@ -266,6 +277,10 @@ A field loses its classes or its icon after an htmx request
 htmx swaps a whole page into a field
     The view does not return the partial response. See
     :ref:`migrate-switch`.
+
+``AttributeError`` in a validator when the user leaves a field
+    The validator reads an attribute that ``__init__`` sets after
+    ``super().__init__()``. Set it before, see step 1.
 
 No htmx attribute renders
     The ``Meta`` still defines ``render_field``. Rename it to
