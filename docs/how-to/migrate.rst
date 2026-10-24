@@ -230,6 +230,12 @@ shows its errors when the user changes it and leaves it. Each time, the
 whole form validates, including the validators that query a database.
 See :doc:`/how-to/inline_validation`.
 
+A field posts to :attr:`~wtforms_htmx.HtmxMeta.htmx_endpoint`, the URL of
+the current page by default. It ignores the ``action`` and the
+:htmx-attr:`hx-post` of the :mdn-tag:`form`. For a form posted to another
+URL, such as a form in a dialog, set ``htmx_endpoint`` to that URL, or
+turn inline validation off for this form.
+
 Check that a field with an invalid value shows its error when the user
 leaves it.
 
@@ -276,7 +282,13 @@ A field loses its classes or its icon after an htmx request
 
 htmx swaps a whole page into a field
     The view does not return the partial response. See
-    :ref:`migrate-switch`.
+    :ref:`migrate-switch`. If the form posts to another URL than the
+    page, set :attr:`~wtforms_htmx.HtmxMeta.htmx_endpoint`, see step 8.
+
+A field gets a 405 error when the user leaves it
+    The form posts to another URL than the page, and the page only
+    accepts GET. Set :attr:`~wtforms_htmx.HtmxMeta.htmx_endpoint`, see
+    step 8.
 
 ``AttributeError`` in a validator when the user leaves a field
     The validator reads an attribute that ``__init__`` sets after
