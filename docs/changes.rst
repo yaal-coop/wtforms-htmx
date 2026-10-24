@@ -4,7 +4,7 @@ Changes
 Version 0.1.1
 -------------
 
-Unreleased
+Released 2026-10-24
 
 - A :class:`~wtforms.fields.BooleanField` validates inline when it is
   checked or unchecked.
