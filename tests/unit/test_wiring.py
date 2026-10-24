@@ -499,3 +499,31 @@ def test_select_source_posts_once_on_change():
         dst = StringField().triggered_by("color", on="change")
 
     assert attr(_Form().color(), "hx-trigger") == "change"
+
+
+@pytest.mark.parametrize("event", ["change", "input delay:200ms"])
+def test_field_that_sends_requests_replaces_its_request_in_flight(event):
+    """A field that sends requests aborts the one in flight on a new event."""
+
+    class _Form(HtmxForm):
+        class Meta:
+            htmx_inline_validation = False
+
+        src = StringField()
+        dst = StringField().triggered_by("src", on=event)
+        other = StringField()
+
+    form = _Form()
+    sender = form.src if event == "change" else form.dst
+    assert attr(sender(), "hx-sync") == "this:replace"
+    assert attr(form.other(), "hx-sync") is None
+
+
+def test_posting_source_sync_can_be_overridden():
+    """A ``render_kw`` value replaces the default ``hx-sync``."""
+
+    class _Form(HtmxForm):
+        src = StringField(render_kw={"hx-sync": "this:queue last"})
+        dst = StringField().triggered_by("src", on="change")
+
+    assert attr(_Form().src(), "hx-sync") == "this:queue last"

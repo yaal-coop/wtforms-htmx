@@ -215,6 +215,8 @@ class HtmxMeta(DefaultMeta):
             return attrs
 
         attrs["hx-trigger"] = ", ".join(extras)
+        # A new event aborts the request in flight, so the last response wins.
+        attrs["hx-sync"] = "this:replace"
 
         attrs.setdefault(self._htmx_request_attr, self.htmx_endpoint)
         attrs.setdefault("hx-include", "closest form")

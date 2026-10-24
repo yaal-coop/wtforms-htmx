@@ -145,6 +145,9 @@ response differs:
    A no-JS POST carries no such id, so this pass never fires without
    htmx.
 
+   Every field that sends requests gets ``hx-sync="this:replace"``: a
+   new event aborts its request in flight, so the last response wins.
+
 ``mutate`` is **idempotent**. Calling it twice in a request is safe;
 the second call does nothing.
 

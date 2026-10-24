@@ -42,6 +42,18 @@ def test_bulk_actions_tick_keeps_the_focus(page, open_example):
     expect(box).to_be_focused()
 
 
+def test_bulk_actions_rapid_ticks_are_all_kept(page, open_example):
+    """Ticks made while a request is in flight stay ticked and are counted."""
+    open_example("Bulk actions")
+
+    page.locator('input[name="selection"]').evaluate_all(
+        "boxes => boxes.forEach(box => box.click())"
+    )
+
+    expect(page.locator(".bulk-active output")).to_have_text("5 selected")
+    expect(page.locator('input[name="selection"]:checked')).to_have_count(5)
+
+
 def test_bulk_actions_toolbar_only_offers_useful_actions(page, open_example):
     """Only the actions that change a ticked message are offered."""
     open_example("Bulk actions")

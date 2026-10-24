@@ -36,7 +36,8 @@ def test_inline_validation_renders_the_form_wide_defaults():
 
     assert _Form().email() == (
         '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
-        ' hx-trigger="blur changed" id="email" name="email" type="text" value="">'
+        ' hx-sync="this:replace" hx-trigger="blur changed" id="email" name="email"'
+        ' type="text" value="">'
     )
 
 
@@ -444,7 +445,8 @@ def test_selector_target_renders_on_the_source():
     """A field with a selector target sends its own request and swaps the selector."""
     assert _PreviewForm().content() == (
         '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
-        ' hx-target="#preview" hx-trigger="input delay:300ms" id="content"'
+        ' hx-sync="this:replace" hx-target="#preview"'
+        ' hx-trigger="input delay:300ms" id="content"'
         ' name="content" type="text" value="">'
     )
 

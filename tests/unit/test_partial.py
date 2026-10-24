@@ -161,8 +161,8 @@ def test_inline_validation_returns_the_field():
     )
     assert form.partial() == HtmxResponse(
         '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
-        ' hx-trigger="blur changed" id="email" name="email" required type="text"'
-        ' value="alice@example.com">',
+        ' hx-sync="this:replace" hx-trigger="blur changed" id="email" name="email"'
+        ' required type="text" value="alice@example.com">',
         {},
     )
 
@@ -267,7 +267,10 @@ def test_list_button_returns_the_list_alone():
         MultiDict({"email": "bad", "tags-0": "a", "add_tag": ""}),
         headers=htmx_headers("add_tag", "tags"),
     )
-    attrs = 'hx-include="closest form" hx-post="" hx-swap="outerHTML" hx-trigger="blur changed"'
+    attrs = (
+        'hx-include="closest form" hx-post="" hx-swap="outerHTML"'
+        ' hx-sync="this:replace" hx-trigger="blur changed"'
+    )
     assert form.partial() == HtmxResponse(
         '<ul id="tags"><li><label for="tags-0">Tags-0</label>'
         f' <input {attrs} id="tags-0" name="tags-0" type="text" value="a"></li>'
