@@ -202,15 +202,19 @@ class HtmxMeta(DefaultMeta):
             if source_id == holder.id
         ]
         extras.extend(own_events)
-        # The request of an own event already runs the callbacks of the fields
-        # this one feeds: an outgoing event at the same moment would send a
-        # second request.
+        # One request runs every callback of this element: a second clause
+        # on the same event would send a second request.
         covered = {
             _event_name(clause) for event in own_events for clause in _clauses(event)
         }
-        extras.extend(event for event in outgoing if _event_name(event) not in covered)
+        posted = list(outgoing)
         if selector_target is not None:
-            extras.append(selector_target[1].event or link_event)
+            posted.extend(_clauses(selector_target[1].event or link_event))
+
+        for event in posted:
+            if (name := _event_name(event)) not in covered:
+                covered.add(name)
+                extras.append(event)
 
         # Every source posts its declaration itself: nothing to listen to.
         if not extras:

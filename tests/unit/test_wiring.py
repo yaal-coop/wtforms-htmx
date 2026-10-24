@@ -569,3 +569,16 @@ def test_several_non_typing_events_are_posted_by_the_source():
 def test_clauses_split_on_top_level_commas(event, clauses):
     """An hx-trigger value splits on the commas outside event filters."""
     assert _clauses(event) == clauses
+
+
+def test_selector_and_field_targets_on_one_event_share_one_clause():
+    """A source with a selector and a field target on one event sends one request."""
+
+    class _Form(HtmxForm):
+        class Meta:
+            htmx_inline_validation = False
+
+        genre = StringField().triggers(["#results", "chips"], on="change")
+        chips = StringField()
+
+    assert attr(_Form().genre(), "hx-trigger") == "change"
