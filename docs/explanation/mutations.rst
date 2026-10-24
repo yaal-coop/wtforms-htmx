@@ -127,10 +127,12 @@ response differs:
      other event, such as ``change``, ``blur`` or ``click``, the source
      sends the request itself. ``mutate`` runs the source's inline
      validation, then the callbacks of the declarations it posts, and
-     records the source and its targets for re-render. The targets are
-     swapped out of band, without the errors of this validation: the
-     user has not reached them yet. When this event is also the one of
-     the source's inline validation, one request does both.
+     records the targets for re-render. The targets show no errors from
+     this validation: the user has not reached them yet. The source
+     re-renders only when it validates inline. Otherwise the response
+     would undo the boxes ticked or the options picked while the request
+     was in flight. When this event is also the one of the source's
+     inline validation, one request does both.
    - **A field with a DOM selector target.** For
      ``.triggers("#preview", callback)``, there is no field to listen:
      the source sends the request itself, with

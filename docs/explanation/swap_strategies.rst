@@ -82,7 +82,9 @@ target and its callback returns HTML, that HTML is the primary swap and
 every field target is out-of-band. A field source declared on a
 typing event fires one request per target instead: each target sends
 its own. On another event, such as ``change``, the source sends one
-request, and every target is out-of-band. A source has at most one selector target. See :ref:`callback-return` for the return types and
+request for all its targets. When the source validates inline, it is
+the primary swap and every target is out-of-band. Otherwise, the first
+target is the primary swap. A source has at most one selector target. See :ref:`callback-return` for the return types and
 :doc:`/how-to/mutations` for recipes.
 
 When nothing provides a primary swap, the library sends

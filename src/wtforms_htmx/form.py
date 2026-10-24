@@ -624,8 +624,10 @@ class HtmxFormMixin:
 
         A field with a selector target runs that callback with the selector
         string as ``target``. A listening field runs every callback declared
-        towards it. Then the field runs the callbacks of the declarations it
-        posts itself, and their targets re-render out of band.
+        towards it, and re-renders. Then the field runs the callbacks of the
+        declarations it posts itself, and their targets re-render. A source
+        that only posts for its targets does not re-render: the response
+        would undo the changes the user made while it was in flight.
         """
         if not self._htmx_headers:
             return
@@ -639,8 +641,6 @@ class HtmxFormMixin:
             self._dispatch_selector(field, mutation)
         elif _state(field, "_htmx_trigger_sources"):
             self._dispatch_listener(field, mutation)
-        elif outgoing:
-            mutation.targets.append(field)
 
         # Inline validation of the source validates the whole form, but the
         # user has not visited the targets yet. A callback may validate them.

@@ -1,6 +1,13 @@
 Changes
 =======
 
+Unreleased
+----------
+
+- A field that sends the request for its targets, for instance on
+  ``change``, keeps the changes made while the request was in flight.
+  It is no longer re-rendered, unless it validates inline.
+
 Version 0.1.1
 -------------
 

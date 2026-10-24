@@ -790,17 +790,19 @@ def test_source_change_with_a_selector_and_a_field_target():
     assert oob_ids(body) == ["chips"]
 
 
-def test_source_without_inline_validation_renders_itself_and_its_target():
-    """Without inline validation, the source is the main swap and the target goes out of band."""
+def test_source_without_inline_validation_renders_only_its_target():
+    """Without inline validation, the target is the main swap and the source is left alone."""
 
     class _Form(_AddressForm):
         class Meta:
             htmx_inline_validation = False
 
     form = _Form(MultiDict({"country": "de"}), headers=htmx_headers("country"))
-    body = form.partial().body
-    assert body.index('id="country"') < body.index('id="postal_code"')
-    assert oob_ids(body) == ["postal_code"]
+    result = form.partial()
+    assert 'id="country"' not in result.body
+    assert 'id="postal_code"' in result.body
+    assert oob_ids(result.body) == []
+    assert result.headers["HX-Retarget"] == "#postal_code"
 
 
 def test_source_change_clears_the_errors_of_a_list_target():
