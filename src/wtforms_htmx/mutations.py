@@ -111,10 +111,7 @@ def value_cycle(values: list[Any]) -> TriggerCallback:
 def value_add(form: Any, source: Any, target: Any) -> None:
     """Append the source's value to a :class:`~wtforms.fields.SelectMultipleField`'s data.
 
-    No deduplication: clicking a button whose value is already in
-    ``target.data`` adds a duplicate entry. Filter at the source if
-    uniqueness matters (e.g. exclude already-selected values from the
-    candidate set).
+    A value that is already selected is not added again.
 
     Each catalog button carries its option's value::
 
@@ -132,10 +129,11 @@ def value_add(form: Any, source: Any, target: Any) -> None:
     _require(target, SelectMultipleField, "value_add")
 
     value = _source_value(source)
-    if not value:
+    selected = list(target.data or [])
+    if not value or value in selected:
         return
 
-    target.data = [*list(target.data or []), value]
+    target.data = [*selected, value]
 
 
 def value_remove(form: Any, source: Any, target: Any) -> None:

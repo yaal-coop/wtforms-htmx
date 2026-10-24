@@ -12,6 +12,7 @@ Unreleased
 - Out-of-band extras come in ``<hx-partial>`` elements on htmx 4 and in
   ``<template>`` elements on htmx 2. A target rendered as a table part,
   such as a ``<tbody>``, is now swapped too.
+- ``value_add`` does not add a value that is already selected.
 - ``on=`` accepts several events, separated by commas, for instance
   ``on="input delay:200ms, focus"``.
 

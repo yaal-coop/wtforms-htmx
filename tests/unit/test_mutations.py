@@ -54,12 +54,12 @@ def test_value_add_appends():
     assert form.tags.data == ["a", "b"]
 
 
-def test_value_add_keeps_duplicates():
-    """``value_add`` appends a value even when it is already selected."""
+def test_value_add_skips_a_selected_value():
+    """``value_add`` does not add a value that is already selected."""
     form = _SelectForm()
     form.tags.data = ["a"]
     value_add(form, _Source("a"), form.tags)
-    assert form.tags.data == ["a", "a"]
+    assert form.tags.data == ["a"]
 
 
 def test_value_add_initializes_when_none():
