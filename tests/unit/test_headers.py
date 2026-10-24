@@ -8,6 +8,7 @@ def test_htmx2_headers_carry_raw_ids():
     info = _parse_request({"HX-Trigger": "email", "HX-Target": "email-wrapper"})
     assert info.source_id == "email"
     assert info.target_id == "email-wrapper"
+    assert not info.htmx4
 
 
 def test_htmx4_headers_strip_the_tag_prefix():
@@ -17,6 +18,7 @@ def test_htmx4_headers_strip_the_tag_prefix():
     )
     assert info.source_id == "email"
     assert info.target_id == "email-wrapper"
+    assert info.htmx4
 
 
 def test_htmx4_element_without_id_yields_none():
@@ -62,7 +64,7 @@ def test_htmx2_ids_are_not_decoded():
 @pytest.mark.parametrize("headers", [None, {}])
 def test_no_headers_yields_empty_info(headers):
     """Missing or empty headers describe a plain request with no source and no target."""
-    assert _parse_request(headers) == (False, False, None, None)
+    assert _parse_request(headers) == (False, False, None, None, False)
 
 
 def test_header_names_are_case_insensitive():
@@ -70,4 +72,4 @@ def test_header_names_are_case_insensitive():
     info = _parse_request(
         {"hx-request": "true", "hx-boosted": "true", "hx-source": "input#email"}
     )
-    assert info == (True, True, "email", None)
+    assert info == (True, True, "email", None, True)

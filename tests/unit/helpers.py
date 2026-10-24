@@ -35,7 +35,9 @@ def markers(html):
 def oob_ids(html):
     """Return the ids of the elements a partial swaps out of band, in order."""
     return [
-        attr(tag, "id")
+        attr(tag, "hx-target").removeprefix("#")
+        if tag.startswith("<hx-partial")
+        else attr(tag, "id")
         for tag in re.findall(r"<[^>]+>", str(html))
-        if "hx-swap-oob" in tag
+        if tag.startswith("<hx-partial") or "hx-swap-oob" in tag
     ]

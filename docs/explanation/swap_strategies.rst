@@ -67,9 +67,9 @@ Some interactions must re-synchronize more than the one element the
 trigger points at: a chip list plus the search box that fed it, a
 per-row total plus an invoice grand total (:doc:`/examples/invoice`),
 a value plus a counter elsewhere on the page. htmx's
-:htmx-attr:`hx-swap-oob` covers this: the response carries extra
-fragments, each routed to its own :mdn-global-attr:`id` rather than into
-:htmx-attr:`hx-target`. One request can then update several
+:htmx-tag:`hx-partial` (htmx 4) and :htmx-attr:`hx-swap-oob` (htmx 2)
+cover this: the response carries extra fragments, each routed to its
+own :mdn-global-attr:`id` rather than into :htmx-attr:`hx-target`. One request can then update several
 non-contiguous zones without re-rendering the whole page. These zones
 can be plain DOM elements that are **not** form fields, such as an
 :mdn-tag:`output` or a status pill.

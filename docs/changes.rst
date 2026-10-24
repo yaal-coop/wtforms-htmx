@@ -9,6 +9,9 @@ Unreleased
   It is no longer re-rendered, unless it validates inline.
 - A new event aborts the request in flight, so fast typing or ticking
   shows the last state.
+- Out-of-band extras come in ``<hx-partial>`` elements on htmx 4 and in
+  ``<template>`` elements on htmx 2. A target rendered as a table part,
+  such as a ``<tbody>``, is now swapped too.
 - ``on=`` accepts several events, separated by commas, for instance
   ``on="input delay:200ms, focus"``.
 

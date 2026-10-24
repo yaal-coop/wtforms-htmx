@@ -111,6 +111,14 @@ The library works on both versions. These points shape how:
   content, such as a filter that re-renders its own list (htmx #4056).
   Set ``htmx.config.defaultSettleDelay`` to ``0`` to avoid it, as the
   examples do.
+- **Out-of-band swaps.** Both versions parse a response as if it were
+  outside a :mdn-tag:`table`, so a :mdn-tag:`tbody` or a :mdn-tag:`tr`
+  marked with :htmx-attr:`hx-swap-oob` is dropped when it follows other
+  elements. On htmx 4, the library sends every out-of-band extra in an
+  :htmx-tag:`hx-partial`. On htmx 2, it sends each one in a
+  :mdn-tag:`template`, with :htmx-attr:`hx-swap-oob` on the extra. The
+  :htmx-tag:`hx-partial` of htmx 2.0.11 loses its target when an
+  earlier swap removed the element that sent the request (htmx #4162).
 - **No** :htmx-header:`hx-trigger-name`. htmx 4 does not send this
   header, so the library ignores it on htmx 2 too. Routing behaves the
   same on both versions.

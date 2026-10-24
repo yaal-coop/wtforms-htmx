@@ -29,7 +29,7 @@ summary as out-of-band extras.
      await wait(500);
 
    The row total updates in place while the invoice subtotal, VAT and
-   grand total arrive in the same response as :htmx-attr:`hx-swap-oob` extras.
+   grand total arrive in the same response as out-of-band extras.
    Editing row 0 does not disturb row 1.
 """
 
@@ -136,7 +136,7 @@ def _compute_totals(form) -> InvoiceTotals:
 
 
 def _totals_oob(form):
-    """Render the three invoice-level totals as ``hx-swap-oob`` extras.
+    """Render the three invoice-level totals as out-of-band extras.
 
     Each fragment carries its own id, so htmx swaps the matching DOM
     element on the client. The targets live in the template as plain
@@ -156,7 +156,7 @@ def recompute_total(form, source, target):
     Reads the entry's sibling fields via ``target._form`` (the inner
     LineItem instance), so the same callback works whether the
     typing source is ``quantity``, ``unit_price`` or ``vat_rate``. The
-    three invoice-level totals ride along as ``hx-swap-oob`` Markup
+    three invoice-level totals ride along as out-of-band Markup
     extras returned alongside the row total.
     """
     line = target._form

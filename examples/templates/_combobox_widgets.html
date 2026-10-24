@@ -11,10 +11,8 @@
    formdata round-trips) and a ``×`` remove button bound to the
    inner ``rm_country`` ButtonField via ``value_remove``.
 
-   Both macros take a trailing ``**kwargs`` so ``hx-swap-oob`` (set
-   by the OOB-target rendering path) flows through to the outer
-   element; without it htmx appends a new node instead of
-   replacing the existing one. #}
+   Both macros take a trailing ``**kwargs`` so the htmx attributes
+   reach the outer element. #}
 
 {%- macro listbox(field) -%}
   <ul role="listbox" id="{{ field.id }}" {{ kwargs|xmlattr }}>

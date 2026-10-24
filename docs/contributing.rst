@@ -204,8 +204,8 @@ Cross-referencing conventions
   ``id`` use the ``:mdn-global-attr:`` role. Element attributes use
   the ``:mdn-attr:`` role, written ``element/path#attr`` (e.g.
   ``:mdn-attr:`button#formnovalidate```). ARIA roles use the
-  ``:mdn-role:`` role. htmx attributes and headers use the
-  ``:htmx-attr:`` and ``:htmx-header:`` roles.
+  ``:mdn-role:`` role. htmx attributes, headers and tags use the
+  ``:htmx-attr:``, ``:htmx-header:`` and ``:htmx-tag:`` roles.
 - These rules apply inside docstrings too, but only the ones Sphinx
   renders: link objects, use the
   MDN/htmx roles, and never surface a private name (``_foo``). Describe

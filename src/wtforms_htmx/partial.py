@@ -10,6 +10,7 @@ from html.parser import HTMLParser
 from typing import Any
 from typing import TYPE_CHECKING
 
+from markupsafe import escape
 from markupsafe import Markup
 from wtforms.fields import Field
 
@@ -155,44 +156,50 @@ def _extract_outer_id(html: str) -> str | None:
     return _OuterTagParser(html).attrs.get("id") or None
 
 
-def _with_swap_oob(html: str) -> str:
-    """Add ``hx-swap-oob="outerHTML"`` to the outer element of an OOB fragment.
+def _out_of_band(html: str, *, htmx4: bool) -> str:
+    """Wrap a fragment so that htmx swaps it into the element with its id.
 
-    Left untouched: a fragment that already sets ``hx-swap-oob``, and a
-    <template> wrapper. Raise ValueError when the outer element has no id.
+    On htmx 4, the fragment goes in an <hx-partial>. On htmx 2, it goes in
+    a <template> with ``hx-swap-oob`` on its outer element: the <hx-partial>
+    of htmx 2.0.11 misses its target once an earlier swap removed the
+    element that sent the request. Both wrappers keep table parts, such as
+    a <tbody>, that htmx drops when they follow other elements. Left
+    untouched: a fragment that sets ``hx-swap-oob`` itself, a <template> or
+    <hx-partial> wrapper, and plain text. Raise ValueError when the outer
+    element has no id.
     """
     outer = _OuterTagParser(html)
-    if outer.tag is None or outer.tag == "template":
+    if outer.tag is None or outer.tag in ("template", "hx-partial"):
         return html
 
     if "hx-swap-oob" in outer.attrs or "data-hx-swap-oob" in outer.attrs:
         return html
 
-    if not outer.attrs.get("id"):
+    if not (element_id := outer.attrs.get("id")):
         raise ValueError(
             f"An out-of-band HTML fragment needs an id on its outer element: {html!r}"
+        )
+
+    if htmx4:
+        target = escape(f"#{element_id}")
+        return (
+            f'<hx-partial hx-target="{target}" hx-swap="outerHTML">{html}</hx-partial>'
         )
 
     head = html[: outer.end]
     close = "/>" if head.endswith("/>") else ">"
     head = head[: -len(close)].rstrip()
-    return f'{head} hx-swap-oob="outerHTML"{close}{html[outer.end :]}'
-
-
-def _render_mutation_target(field: Any, *, oob: bool) -> str:
-    """Render one field for a partial response, through its wrapper.
-
-    An out-of-band field gets ``hx-swap-oob`` on the outer element of its
-    rendering, so the whole wrapper is swapped. A ``hide_value`` widget
-    (PasswordInput) shows the typed value during this render, so the swap
-    does not erase it.
-    """
-    html = _render_revealed(field)
-    return _with_swap_oob(html) if oob else html
+    return (
+        f'<template>{head} hx-swap-oob="outerHTML"{close}{html[outer.end :]}</template>'
+    )
 
 
 def _render_revealed(field: Any) -> str:
-    """Render ``field``, with the value of a ``hide_value`` widget shown."""
+    """Render ``field`` through its wrapper for a partial response.
+
+    A ``hide_value`` widget (PasswordInput) shows the typed value during
+    this render, so the swap does not erase it.
+    """
     widget = getattr(field, "widget", None)
     if not (getattr(widget, "hide_value", False) and field.data):
         return str(field.meta.render_field(field, {}))
@@ -206,8 +213,8 @@ def _render_revealed(field: Any) -> str:
         field.widget = widget
 
 
-def _render_oob(form: HtmxFormMixin, extras: list[Any]) -> Markup:
-    """Render out-of-band extras, each once.
+def _render_oob(form: HtmxFormMixin, extras: list[Any], *, htmx4: bool) -> Markup:
+    """Render out-of-band extras, each once, with their whole wrapper.
 
     Fields are deduplicated by identity, HTML fragments by outer id.
     """
@@ -220,10 +227,8 @@ def _render_oob(form: HtmxFormMixin, extras: list[Any]) -> Markup:
             continue
 
         seen.add(key)
-        if is_html:
-            html += Markup(_with_swap_oob(str(extra)))
-        else:
-            html += Markup(_render_mutation_target(extra, oob=True))
+        fragment = str(extra) if is_html else _render_revealed(extra)
+        html += Markup(_out_of_band(fragment, htmx4=htmx4))
 
     return html
 
@@ -246,12 +251,12 @@ def _render_mutation_response(
     if mutation.primary_override is not None:
         body = mutation.primary_override
     elif primary_field is not None:
-        body = Markup(_render_mutation_target(primary_field, oob=False))
+        body = Markup(_render_revealed(primary_field))
     else:
-        oob = _render_oob(form, rest + mutation.oob_extras)
+        oob = _render_oob(form, rest + mutation.oob_extras, htmx4=request.htmx4)
         return HtmxResponse(body=str(oob), headers={"HX-Reswap": "none"})
 
-    body += _render_oob(form, rest + mutation.oob_extras)
+    body += _render_oob(form, rest + mutation.oob_extras, htmx4=request.htmx4)
     if retarget := _compute_retarget(str(body), request):
         response_headers["HX-Retarget"] = retarget
 

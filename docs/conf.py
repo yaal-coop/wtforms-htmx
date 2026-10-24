@@ -60,6 +60,10 @@ extlinks = {
         "https://htmx.org/reference/?h=%s#headers",
         "%s",
     ),
+    "htmx-tag": (
+        "https://four.htmx.org/reference/tags/%s",
+        "<%s>",
+    ),
     "mdn-tag": (
         "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/%s",
         "<%s>",

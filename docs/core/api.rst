@@ -138,10 +138,12 @@ With several field targets, a ``str`` or ``Field`` override replaces the
 first target. The other targets still re-render out of band.
 
 htmx swaps each out-of-band extra into the element with the same
-:mdn-global-attr:`id` (:htmx-attr:`hx-swap-oob`). A
-:class:`~wtforms.fields.Field` is rendered through its wrapper. An HTML ``str`` must be one element with
-an :mdn-global-attr:`id`. The library adds ``hx-swap-oob="outerHTML"`` to both, unless
-the ``str`` already sets :htmx-attr:`hx-swap-oob`.
+:mdn-global-attr:`id`. A :class:`~wtforms.fields.Field` is rendered
+through its wrapper. An HTML ``str`` must be one element with an
+:mdn-global-attr:`id`. The library sends both in an
+:htmx-tag:`hx-partial` on htmx 4, and in a :mdn-tag:`template` with
+:htmx-attr:`hx-swap-oob` on htmx 2. A ``str`` that already sets
+:htmx-attr:`hx-swap-oob` is left as is.
 
 .. _dom-targets:
 

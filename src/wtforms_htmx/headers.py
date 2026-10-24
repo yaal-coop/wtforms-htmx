@@ -18,6 +18,7 @@ class _HtmxRequestInfo(NamedTuple):
     boosted: bool
     source_id: str | None
     target_id: str | None
+    htmx4: bool
 
 
 def _element_id(identifier: str | None) -> str | None:
@@ -45,6 +46,7 @@ def _parse_request(headers: Mapping[str, str] | None) -> _HtmxRequestInfo:
             boosted=boosted,
             source_id=_element_id(source),
             target_id=_element_id(lowered.get("hx-target")),
+            htmx4=True,
         )
 
     return _HtmxRequestInfo(
@@ -52,4 +54,5 @@ def _parse_request(headers: Mapping[str, str] | None) -> _HtmxRequestInfo:
         boosted=boosted,
         source_id=lowered.get("hx-trigger") or None,
         target_id=lowered.get("hx-target") or None,
+        htmx4=False,
     )

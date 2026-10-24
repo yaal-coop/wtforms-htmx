@@ -486,10 +486,10 @@ A callback can return an iterable to refresh more than one element in
 a single response. The first item is the primary swap: ``None`` keeps
 the default render of ``target``, and an HTML ``str`` overrides it. The
 other items are *out-of-band* extras. htmx places each one by its own
-:mdn-global-attr:`id` (:htmx-attr:`hx-swap-oob`), not in the primary target.
+:mdn-global-attr:`id`, not in the primary target.
 
 Each extra can be a :class:`~wtforms.fields.Field` or an HTML ``str``.
-The library adds ``hx-swap-oob="outerHTML"`` to both. Pick the variant
+The library sends both out of band. Pick the variant
 that matches the extra: a form field whose value should change, or a
 DOM element that lives only in the template.
 
@@ -549,8 +549,8 @@ in the template, not the form schema.
 
 A string without an :mdn-global-attr:`id` on its outer element raises
 :exc:`ValueError`. When a fragment sets :htmx-attr:`hx-swap-oob` itself,
-or wraps its content in a :mdn-tag:`template`, the library leaves it
-as is.
+or comes in a :mdn-tag:`template` or an :htmx-tag:`hx-partial`, the
+library leaves it as is.
 
 See also
 --------

@@ -24,7 +24,7 @@ from wtforms_htmx.mutations import list_add
 from wtforms_htmx.mutations import list_remove
 from wtforms_htmx.mutations import value_set
 from wtforms_htmx.partial import _extract_outer_id
-from wtforms_htmx.partial import _with_swap_oob
+from wtforms_htmx.partial import _out_of_band
 
 from .helpers import attr
 from .helpers import htmx_headers
@@ -64,44 +64,66 @@ def test_extract_outer_id(html, expected):
 
 
 @pytest.mark.parametrize(
+    "html",
+    [
+        '<output id="t" class="x">1</output>',
+        '<!-- c -->\n<div\n id="t">y</div>',
+        '<tbody id="t"><tr><td>a</td></tr></tbody>',
+    ],
+    ids=["element", "comment-and-newlines", "table-part"],
+)
+def test_out_of_band_uses_a_partial_on_htmx4(html):
+    """On htmx 4, a fragment goes in an ``<hx-partial>`` that targets its id."""
+    assert _out_of_band(html, htmx4=True) == (
+        f'<hx-partial hx-target="#t" hx-swap="outerHTML">{html}</hx-partial>'
+    )
+
+
+@pytest.mark.parametrize(
     ("html", "expected"),
     [
         (
             '<output id="t" class="x" >1</output>',
             '<output id="t" class="x" hx-swap-oob="outerHTML">1</output>',
         ),
-        ('<input id="e" />', '<input id="e" hx-swap-oob="outerHTML"/>'),
+        ('<input id="t" />', '<input id="t" hx-swap-oob="outerHTML"/>'),
         (
-            '<!-- c -->\n<div\n id="x">y</div>',
-            '<!-- c -->\n<div\n id="x" hx-swap-oob="outerHTML">y</div>',
+            '<!-- c -->\n<div\n id="t">y</div>',
+            '<!-- c -->\n<div\n id="t" hx-swap-oob="outerHTML">y</div>',
+        ),
+        (
+            '<tbody id="t"><tr><td>a</td></tr></tbody>',
+            '<tbody id="t" hx-swap-oob="outerHTML"><tr><td>a</td></tr></tbody>',
         ),
     ],
-    ids=["element", "self-closing", "comment-and-newlines"],
+    ids=["element", "self-closing", "comment-and-newlines", "table-part"],
 )
-def test_with_swap_oob_marks_the_outer_element(html, expected):
-    """``hx-swap-oob="outerHTML"`` is added to the outer element of a fragment."""
-    assert _with_swap_oob(html) == expected
+def test_out_of_band_uses_a_template_on_htmx2(html, expected):
+    """On htmx 2, a fragment gets ``hx-swap-oob`` and goes in a ``<template>``."""
+    assert _out_of_band(html, htmx4=False) == f"<template>{expected}</template>"
 
 
+@pytest.mark.parametrize("htmx4", [True, False])
 @pytest.mark.parametrize(
     "html",
     [
         '<div id="x" hx-swap-oob="innerHTML">a</div>',
         '<div id="x" data-hx-swap-oob="true">a</div>',
         '<template><tr id="r" hx-swap-oob="true"></tr></template>',
+        '<hx-partial hx-target="#r"><tr id="r"></tr></hx-partial>',
         "just text",
     ],
-    ids=["explicit", "data-prefixed", "template", "text"],
+    ids=["explicit", "data-prefixed", "template", "hx-partial", "text"],
 )
-def test_with_swap_oob_keeps_the_fragment(html):
-    """A fragment that sets its own swap, a ``<template>`` or plain text is left as is."""
-    assert _with_swap_oob(html) == html
+def test_out_of_band_keeps_the_fragment(html, htmx4):
+    """A fragment that sets its own swap, a wrapper or plain text is left as is."""
+    assert _out_of_band(html, htmx4=htmx4) == html
 
 
-def test_with_swap_oob_requires_an_outer_id():
+def test_out_of_band_requires_an_outer_id():
     """An outer element without an id raises ``ValueError``."""
     with pytest.raises(ValueError, match="needs an id"):
-        _with_swap_oob('<div class="x">a</div>')
+        _out_of_band('<div class="x">a</div>', htmx4=True)
 
 
 class _UserForm(HtmxForm):
@@ -373,7 +395,7 @@ def test_selector_callback_list_puts_the_extras_out_of_band():
 
     form = _Form(MultiDict({"content": "x"}), headers=htmx_headers("content"))
     assert form.partial().body == (
-        '<div id="preview">primary</div>' + _with_swap_oob(str(form.side()))
+        '<div id="preview">primary</div>' + _out_of_band(str(form.side()), htmx4=True)
     )
 
 
@@ -394,8 +416,8 @@ def test_selector_callback_list_without_primary_swaps_only_the_extras():
     result = form.partial()
     assert result.headers == {"HX-Reswap": "none"}
     assert result.body == (
-        _with_swap_oob(str(form.side()))
-        + '<output id="grand_total" hx-swap-oob="outerHTML">42</output>'
+        _out_of_band(str(form.side()), htmx4=True)
+        + _out_of_band('<output id="grand_total">42</output>', htmx4=True)
     )
 
 
@@ -431,7 +453,7 @@ def test_out_of_band_extras_are_rendered_once():
     body = form.partial().body
     assert body.count('id="side"') == 1
     assert body.count('id="note"') == 1
-    assert body.endswith('<p id="note" hx-swap-oob="outerHTML">1</p>plain text')
+    assert body.endswith(_out_of_band('<p id="note">1</p>', htmx4=True) + "plain text")
 
 
 class _ListenerForm(HtmxForm):
@@ -485,7 +507,7 @@ def test_listener_callback_field_list_puts_the_extras_out_of_band():
     assert 'id="dst"' not in body
     assert body.index('id="other"') < body.index('id="side"')
     assert oob_ids(body) == ["side"]
-    assert body.count("hx-swap-oob") == 1
+    assert body.count("<hx-partial") == 1
 
 
 def test_listener_callback_empty_list_keeps_the_target_render():
@@ -521,7 +543,7 @@ def test_button_callback_field_keeps_the_other_targets_out_of_band():
     body = form.partial().body
     assert 'id="dst"' not in body
     assert body.count('id="other"') == 1
-    assert body.count("hx-swap-oob") == 1
+    assert body.count("<hx-partial") == 1
     assert body.index('id="other"') < body.index('id="side"')
     assert oob_ids(body) == ["side"]
 
@@ -539,7 +561,7 @@ def test_button_without_callback_renders_its_targets():
     body = form.partial().body
     assert body.index('id="dst"') < body.index('id="other"')
     assert oob_ids(body) == ["other"]
-    assert body.count("hx-swap-oob") == 1
+    assert body.count("<hx-partial") == 1
 
 
 def test_nested_field_renders_with_its_own_form_meta():
@@ -607,7 +629,7 @@ def test_button_selector_and_field_targets_render_together():
 
     form = _Form(MultiDict({"save": ""}), headers={"HX-Request": "true"})
     assert form.partial().body == (
-        '<div id="preview">primary</div>' + _with_swap_oob(str(form.side()))
+        '<div id="preview">primary</div>' + _out_of_band(str(form.side()), htmx4=False)
     )
 
 
@@ -704,8 +726,10 @@ def test_wrapped_out_of_band_target_swaps_its_wrapper():
 
     form = _Form(MultiDict({"go": ""}), headers=htmx_headers("go"))
     body = form.partial().body
-    assert '<div id="wrap-b" hx-swap-oob="outerHTML">' in body
-    assert body.count("hx-swap-oob") == 1
+    assert (
+        '<hx-partial hx-target="#wrap-b" hx-swap="outerHTML"><div id="wrap-b">' in body
+    )
+    assert body.count("<hx-partial") == 1
 
 
 def _set_hint(form, source, target):
@@ -791,6 +815,41 @@ def test_source_change_with_a_selector_and_a_field_target():
     body = form.partial().body
     assert body.startswith('<p id="preview">ok</p>')
     assert oob_ids(body) == ["chips"]
+
+
+def _tbody_widget(field, **kwargs):
+    return Markup(f'<tbody id="{field.id}"><tr><td>{field.data}</td></tr></tbody>')
+
+
+class _TableForm(HtmxForm):
+    bar = StringField()
+    rows = StringField(widget=_tbody_widget, wrapper=False)
+    go = ButtonField("Go").triggers(["bar", "rows"])
+
+
+def test_htmx4_extras_go_in_partials():
+    """On htmx 4, an out-of-band ``<tbody>`` goes in an ``<hx-partial>``."""
+    form = _TableForm(MultiDict({"go": "", "rows": "x"}), headers=htmx_headers("go"))
+    body = form.partial().body
+    assert body.index('id="bar"') < body.index("<hx-partial")
+    assert (
+        '<hx-partial hx-target="#rows" hx-swap="outerHTML">'
+        '<tbody id="rows"><tr><td>x</td></tr></tbody></hx-partial>'
+    ) in body
+
+
+def test_htmx2_extras_go_in_templates():
+    """On htmx 2, an out-of-band ``<tbody>`` goes in a ``<template>``."""
+    form = _TableForm(
+        MultiDict({"go": "", "rows": "x"}),
+        headers={"HX-Request": "true", "HX-Trigger": "go"},
+    )
+    body = form.partial().body
+    assert body.index('id="bar"') < body.index("<template>")
+    assert (
+        '<template><tbody id="rows" hx-swap-oob="outerHTML">'
+        "<tr><td>x</td></tr></tbody></template>"
+    ) in body
 
 
 def test_source_without_inline_validation_renders_only_its_target():
