@@ -91,12 +91,20 @@ user pauses typing for 200 ms. A button source fires on click. Pass
     query.triggers("results", on="input delay:500ms")
     name.triggers("mode", restore, on="keyup[key=='Escape']")
 
+Separate several events with commas. For instance, to also refresh the
+target when the source gets the focus:
+
+.. code-block:: python
+
+    query.triggers("suggestions", on="input delay:200ms, focus")
+
 To change the default for every declaration of a form, set
 :attr:`~wtforms_htmx.HtmxMeta.htmx_default_trigger` on its ``Meta``.
 
 The event decides which field sends the request. For a typing event
 (``input``, ``keyup``, ``keydown``, ``keypress``), the target listens to
-the source and sends it. For any other event, the source sends it. The
+the source and sends it. For any other event, the source sends it. When
+``on=`` holds a typing event, the target listens for all its events. The
 target then shows no validation error, even when it is required and
 still empty: the user has not reached it yet. A callback can still
 validate it, for instance when it already has a value:

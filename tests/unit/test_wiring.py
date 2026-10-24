@@ -11,6 +11,7 @@ from wtforms import StringField
 from wtforms import SubmitField
 
 from wtforms_htmx import HtmxForm
+from wtforms_htmx.meta import _clauses
 from wtforms_htmx.meta import _from_clause
 from wtforms_htmx.mutations import list_add
 from wtforms_htmx.mutations import list_remove
@@ -527,3 +528,44 @@ def test_posting_source_sync_can_be_overridden():
         dst = StringField().triggered_by("src", on="change")
 
     assert attr(_Form().src(), "hx-sync") == "this:queue last"
+
+
+def test_several_events_with_a_typing_one_are_all_listened_to():
+    """A declaration with a typing event gets one listener clause per event."""
+
+    class _Form(HtmxForm):
+        src = StringField()
+        dst = StringField().triggered_by("src", on="input delay:200ms, focus")
+
+    form = _Form()
+    assert attr(form.dst(), "hx-trigger") == (
+        f"{marker_clause('input delay:200ms', 'dst')},"
+        f" {marker_clause('focusin', 'dst--1')}, blur changed"
+    )
+    assert markers(form.src()) == ["dst", "dst--1"]
+
+
+def test_several_non_typing_events_are_posted_by_the_source():
+    """A declaration without a typing event is posted by the source on each event."""
+
+    class _Form(HtmxForm):
+        src = StringField()
+        dst = StringField().triggered_by("src", on="change, focus")
+
+    form = _Form()
+    assert attr(form.src(), "hx-trigger") == "blur changed, change, focus"
+    assert markers(form.src()) == []
+
+
+@pytest.mark.parametrize(
+    ("event", "clauses"),
+    [
+        ("change", ["change"]),
+        ("input delay:200ms, focus", ["input delay:200ms", "focus"]),
+        ("keyup[key=='a,b'], focus", ["keyup[key=='a,b']", "focus"]),
+        ("change,", ["change"]),
+    ],
+)
+def test_clauses_split_on_top_level_commas(event, clauses):
+    """An hx-trigger value splits on the commas outside event filters."""
+    assert _clauses(event) == clauses

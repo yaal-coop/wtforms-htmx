@@ -205,7 +205,9 @@ class HtmxMeta(DefaultMeta):
         # The request of an own event already runs the callbacks of the fields
         # this one feeds: an outgoing event at the same moment would send a
         # second request.
-        covered = {_event_name(event) for event in own_events}
+        covered = {
+            _event_name(clause) for event in own_events for clause in _clauses(event)
+        }
         extras.extend(event for event in outgoing if _event_name(event) not in covered)
         if selector_target is not None:
             extras.append(selector_target[1].event or link_event)
@@ -309,6 +311,26 @@ _SOURCE_ATTR = "data-wtforms-htmx-for"
 _TYPING_EVENTS = frozenset({"input", "keyup", "keydown", "keypress"})
 
 
+def _clauses(event: str) -> list[str]:
+    """Split an ``hx-trigger`` value into its comma-separated clauses.
+
+    A comma inside an event filter, between ``[`` and ``]``, does not split.
+    """
+    clauses: list[str] = []
+    depth = start = 0
+    for index, char in enumerate(event):
+        if char == "[":
+            depth += 1
+        elif char == "]":
+            depth -= 1
+        elif char == "," and depth == 0:
+            clauses.append(event[start:index])
+            start = index + 1
+
+    clauses.append(event[start:])
+    return [clause.strip() for clause in clauses if clause.strip()]
+
+
 def _event_name(event: str) -> str:
     """Return the bare event name of an ``hx-trigger`` clause, ``blur`` as ``focusout``."""
     return _bubbling(event).split(" ", 1)[0].split("[", 1)[0]
@@ -318,15 +340,17 @@ def _is_source_posted(source_name: str, entry: Any) -> bool:
     """Tell whether the source sends the request of a declaration itself.
 
     It does for any event but typing and polling. The target listens for
-    those, so a request is sent while the user types in the source. The
+    those, so a request is sent while the user types in the source. A
+    declaration with several events is listened to as soon as one of them
+    is typing or polling. The
     server cannot tell which event sent a request (htmx#4161), so a source
     cannot both validate on blur and post its typing.
     """
     if source_name == "*" or entry.event is None:
         return False
 
-    name = _event_name(entry.event)
-    return name not in _TYPING_EVENTS and name != "every"
+    names = {_event_name(clause) for clause in _clauses(entry.event)}
+    return not names & _TYPING_EVENTS and "every" not in names
 
 
 def _outgoing_events(holder: Any) -> list[str]:
@@ -339,8 +363,10 @@ def _outgoing_events(holder: Any) -> list[str]:
             if source_id == listener.id or source_name != holder.name:
                 continue
 
-            if _is_source_posted(source_name, entry) and entry.event not in events:
-                events.append(entry.event)
+            if not _is_source_posted(source_name, entry):
+                continue
+
+            events.extend(c for c in _clauses(entry.event) if c not in events)
 
     return events
 
@@ -358,8 +384,8 @@ def _source_groups(holder: Any, default_event: str) -> list[tuple[str, list[str]
         if source_id == holder.id or _is_source_posted(source_name, entry):
             continue
 
-        event = _bubbling(entry.event or default_event)
-        groups.setdefault(event, []).append(source_name)
+        for clause in _clauses(entry.event or default_event):
+            groups.setdefault(_bubbling(clause), []).append(source_name)
 
     return list(groups.items())
 

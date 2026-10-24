@@ -9,6 +9,8 @@ Unreleased
   It is no longer re-rendered, unless it validates inline.
 - A new event aborts the request in flight, so fast typing or ticking
   shows the last state.
+- ``on=`` accepts several events, separated by commas, for instance
+  ``on="input delay:200ms, focus"``.
 
 Version 0.1.1
 -------------

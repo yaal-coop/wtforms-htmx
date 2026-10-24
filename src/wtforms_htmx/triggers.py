@@ -124,9 +124,9 @@ def _unbound_triggers(
         ``result`` drives the response body (see :ref:`callback-return`).
         Without a callback, the target re-renders from the current form
         state. See :mod:`wtforms_htmx.mutations` for built-in callbacks.
-    :param on: optional :htmx-attr:`hx-trigger` event override. When ``None``,
-        the form-wide :attr:`~wtforms_htmx.HtmxMeta.htmx_default_trigger`
-        applies.
+    :param on: optional :htmx-attr:`hx-trigger` event override. Separate
+        several events with commas. When ``None``, the form-wide
+        :attr:`~wtforms_htmx.HtmxMeta.htmx_default_trigger` applies.
 
     .. code-block:: python
 
