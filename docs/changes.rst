@@ -1,6 +1,16 @@
 Changes
 =======
 
+Version 0.1.1
+-------------
+
+Unreleased
+
+- A :class:`~wtforms.fields.BooleanField` validates inline when it is
+  checked or unchecked.
+- File and hidden inputs, including the CSRF token, no longer validate
+  inline.
+
 Version 0.1.0
 -------------
 

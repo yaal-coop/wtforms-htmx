@@ -4,10 +4,14 @@ import json
 
 import pytest
 from markupsafe import Markup
+from wtforms import BooleanField
 from wtforms import ButtonField
 from wtforms import DataList
 from wtforms import FieldList
+from wtforms import FileField
 from wtforms import FormField
+from wtforms import HiddenField
+from wtforms import MultipleFileField
 from wtforms import RadioField
 from wtforms import SelectChoice
 from wtforms import SelectField
@@ -15,6 +19,7 @@ from wtforms import SelectMultipleField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import widgets
+from wtforms.csrf.session import SessionCSRF
 
 from wtforms_htmx import HtmxForm
 from wtforms_htmx.mutations import list_add
@@ -74,6 +79,43 @@ def test_inline_validation_of_an_option_list_fires_on_change(field):
     assert html.startswith("<ul ")
     assert html.count("hx-trigger") == 1
     assert attr(html, "hx-trigger") == "change"
+
+
+def test_inline_validation_of_a_checkbox_fires_on_change():
+    """A single checkbox validates on ``change``, its value never changes."""
+
+    class _Form(HtmxForm):
+        agree = BooleanField()
+
+    assert attr(_Form().agree(), "hx-trigger") == "change"
+
+
+@pytest.mark.parametrize(
+    "field",
+    [FileField(), MultipleFileField(), HiddenField()],
+    ids=["file", "multiple-files", "hidden"],
+)
+def test_inline_validation_skips_file_and_hidden_inputs(field):
+    """File and hidden inputs get no inline validation."""
+
+    class _Form(HtmxForm):
+        pass
+
+    _Form.input = field
+    assert "hx-" not in _Form().input()
+
+
+def test_inline_validation_skips_the_csrf_token():
+    """The CSRF token gets no inline validation."""
+
+    class _Form(HtmxForm):
+        class Meta:
+            csrf = True
+            csrf_class = SessionCSRF
+            csrf_secret = b"secret"
+
+    form = _Form(meta={"csrf_context": {}})
+    assert "hx-" not in form.csrf_token()
 
 
 def test_inline_validation_skips_buttons_and_containers():

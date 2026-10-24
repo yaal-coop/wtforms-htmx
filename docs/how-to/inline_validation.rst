@@ -10,7 +10,8 @@ Setup
 
 Inline validation is on by default (see :doc:`/core/overview`): each
 :class:`~wtforms_htmx.HtmxForm` field is validated when the user leaves
-it. Declare your validators:
+it. Selects, checkboxes and radio buttons validate when they change.
+File and hidden inputs do not validate inline. Declare your validators:
 
 .. code-block:: python
 

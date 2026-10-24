@@ -120,6 +120,13 @@ def _inline_validation_fields(fields: Any) -> Any:
             yield field
 
 
+# ``hx-include`` does not send files. A hidden input shows no error.
+_NO_INLINE_VALIDATION_INPUTS = frozenset({"file", "hidden"})
+
+# The value of a checkbox or a radio button does not change when it is
+# toggled, so ``changed`` would never let the request through.
+_TOGGLE_INPUTS = frozenset({"checkbox", "radio"})
+
 _HTMX_TARGET_KEYWORDS = frozenset({"this", "next", "previous", "body"})
 
 
@@ -369,14 +376,16 @@ class HtmxFormMixin:
         """Declare inline validation as a self-trigger on every eligible field.
 
         It covers the rows of a FieldList of plain fields. A FormField wires its
-        own form. Skipped: submit sources and fields with a selector target. A
-        select, and a list of radio buttons or checkboxes, validates on
-        ``change``. The declaration is replaced each time, so a renumbered row
-        keeps its id.
+        own form. Skipped: submit sources, file and hidden inputs, and fields
+        with a selector target. Selects, checkboxes, radio buttons and their
+        lists validate on ``change``. The
+        declaration is replaced each time, so a renumbered row keeps its id.
         """
         for holder in _inline_validation_fields(self._fields.values()):
+            input_type = getattr(holder.widget, "input_type", None)
             if (
                 _is_submit_source(holder)
+                or input_type in _NO_INLINE_VALIDATION_INPUTS
                 or _state(holder, "_htmx_selector_target") is not None
             ):
                 continue
@@ -386,6 +395,7 @@ class HtmxFormMixin:
             event = (
                 "change"
                 if isinstance(holder.widget, (ListWidget, Select))
+                or input_type in _TOGGLE_INPUTS
                 else self.meta.htmx_validation_trigger
             )
             sources = _state(holder, "_htmx_trigger_sources") or []

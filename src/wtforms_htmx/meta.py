@@ -83,8 +83,9 @@ class HtmxMeta(DefaultMeta):
     htmx_validation_trigger: str = "blur changed"
     """Full :htmx-attr:`hx-trigger` string for inline validation (event + modifiers
     + optional ``delay:Xms``), e.g. ``"blur changed"`` (default) or
-    ``"change delay:200ms"``. A select, and a list of radio buttons or
-    checkboxes, always validates on ``change``."""
+    ``"change delay:200ms"``. Selects, checkboxes, radio buttons and their
+    lists always validate on ``change``. File and hidden inputs do not
+    validate inline."""
 
     # No ``changed``: it never fires on a from:body listener on htmx 4.0.0
     # (htmx#4033, fixed by htmx#4035 and htmx#4096 but unreleased).
