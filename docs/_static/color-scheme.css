@@ -1,19 +1,15 @@
 /* The theme has no dark mode: show the light captures even when the OS is
-   dark, and the dark ones only when Dark Reader darkens the page. */
-@media (prefers-color-scheme: dark) {
-    .only-light {
-        display: revert;
-    }
-
-    .only-dark {
-        display: none;
-    }
-}
-
-html[data-darkreader-scheme="dark"] .only-light {
+   dark, and the dark ones only when Dark Reader darkens the page.
+   The selectors name the figure: basic.css shows figure.align-default,
+   which beats a bare class. */
+figure.only-dark {
     display: none;
 }
 
-html[data-darkreader-scheme="dark"] .only-dark {
+html[data-darkreader-scheme="dark"] figure.only-light {
+    display: none;
+}
+
+html[data-darkreader-scheme="dark"] figure.only-dark {
     display: revert;
 }
