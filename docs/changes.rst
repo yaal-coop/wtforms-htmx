@@ -1,8 +1,10 @@
 Changes
 =======
 
-Unreleased
-----------
+Version 0.1.2
+-------------
+
+Released 2026-10-25
 
 - A field that sends the request for its targets, for instance on
   ``change``, keeps the changes made while the request was in flight.
