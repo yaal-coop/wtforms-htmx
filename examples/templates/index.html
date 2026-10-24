@@ -37,6 +37,20 @@
 
     <article class="example-card">
       <header>
+        <h3><a href="{{ url_for('main.bulk_actions') }}">Bulk actions</a></h3>
+      </header>
+      <p>
+        An inbox where ticked messages share one toolbar action. Each
+        tick refreshes a <code>FormField</code> toolbar that counts the
+        selection and only offers the useful actions. The
+        <code>All</code> / <code>Read</code> / <code>Unread</code> /
+        <code>None</code> buttons are mutations; the actions are
+        dispatched with <code>form.submitter</code>.
+      </p>
+    </article>
+
+    <article class="example-card">
+      <header>
         <h3><a href="{{ url_for('main.combobox') }}">Combobox</a></h3>
       </header>
       <p>

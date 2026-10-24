@@ -1,0 +1,135 @@
+/* Bulk actions: select shortcuts and a toolbar over a message table. */
+
+/* ----- Bar -------------------------------------------------------------- */
+
+.bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  min-height: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.bulk-select {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--pico-muted-color);
+}
+
+.bulk-bar [role="group"] {
+  width: auto;
+  margin: 0;
+}
+
+.bulk-bar button,
+.bulk-bar input[type="submit"] {
+  width: auto;
+  margin-bottom: 0;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.875rem;
+}
+
+.bulk-toolbar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.bulk-idle {
+  color: var(--pico-muted-color);
+}
+
+.bulk-active {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  width: 100%;
+}
+
+.bulk-active output {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.bulk-active [role="group"] {
+  margin-left: auto;
+}
+
+/* CSS, not JavaScript, swaps the idle line for the actions on the first
+   tick, so the page behaves the same without JavaScript. */
+.demo-area:not(:has(input[name="selection"]:checked)) .bulk-active,
+.demo-area:has(input[name="selection"]:checked) .bulk-idle {
+  display: none;
+}
+
+/* ----- Table ------------------------------------------------------------ */
+
+.inbox {
+  margin-bottom: 0;
+}
+
+.inbox th,
+.inbox td {
+  vertical-align: middle;
+}
+
+.inbox .col-select {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.inbox .col-received {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+  color: var(--pico-muted-color);
+}
+
+@media (max-width: 576px) {
+  .inbox .col-received {
+    display: none;
+  }
+
+  .bulk-active,
+  .bulk-active [role="group"] {
+    flex-wrap: wrap;
+  }
+
+  .bulk-active [role="group"] {
+    margin-left: 0;
+  }
+}
+
+.inbox input[type="checkbox"] {
+  margin: 0;
+}
+
+.inbox label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.inbox tbody tr:has(input:checked) > * {
+  background-color: color-mix(in srgb, var(--pico-primary-background) 12%, transparent);
+}
+
+.inbox tr.unread td {
+  font-weight: bold;
+}
+
+.inbox tr.unread .col-sender label::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  background: var(--pico-primary-background);
+  vertical-align: middle;
+}
+
+.inbox tr:not(.unread) .col-sender label {
+  padding-left: 1rem;
+}

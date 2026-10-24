@@ -127,6 +127,7 @@ Features
     examples/inline_edit
     examples/tag_picker
     examples/dual_listbox
+    examples/bulk_actions
     examples/combobox
     examples/task_list
     examples/address

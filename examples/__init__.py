@@ -17,6 +17,7 @@ bp = Blueprint("main", __name__)
 EXAMPLES = {
     "attendance": "Attendance grid",
     "auto_save": "Auto-save",
+    "bulk_actions": "Bulk actions",
     "combobox": "Combobox",
     "currency": "Currency converter",
     "cycle_button": "Cycle button",
@@ -53,6 +54,7 @@ def toggle_htmx():
 from . import address  # noqa: E402, F401
 from . import attendance  # noqa: E402, F401
 from . import auto_save  # noqa: E402, F401
+from . import bulk_actions  # noqa: E402, F401
 from . import combobox  # noqa: E402, F401
 from . import currency  # noqa: E402, F401
 from . import cycle_button  # noqa: E402, F401

@@ -1,0 +1,62 @@
+{# BulkActionsForm.selection and BulkActionsForm.toolbar.
+
+   ``inbox`` renders the message table. Each row holds the checkbox of
+   the matching ``selection`` option. The table carries the htmx
+   attributes of ``selection``: a tick posts the form and refreshes the
+   toolbar.
+
+   ``toolbar`` renders the count and the actions. CSS hides the actions
+   until a box is ticked, so this also works without JavaScript. Only an
+   htmx request hides the actions that change no ticked message: without
+   JavaScript, the page cannot follow the ticks.
+#}
+
+{%- macro inbox(field) -%}
+  {%- set messages = field._form.inbox() -%}
+  <table id="{{ field.id }}" class="inbox"{{ kwargs|xmlattr }}>
+    <thead>
+      <tr>
+        <th scope="col" class="col-select"><span class="visually-hidden">Selected</span></th>
+        <th scope="col">From</th>
+        <th scope="col">Subject</th>
+        <th scope="col" class="col-received">Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for option in field %}
+        {% set message = messages[loop.index0] %}
+        <tr{% if not message.read %} class="unread"{% endif %}>
+          <td class="col-select">{{ option(aria_label="Select " ~ message.subject) }}</td>
+          <td class="col-sender">
+            <label for="{{ option.id }}">
+              {% if not message.read %}<span class="visually-hidden">Unread, </span>{% endif %}
+              {{ message.sender }}
+            </label>
+          </td>
+          <td>{{ message.subject }}</td>
+          <td class="col-received">{{ message.received }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4">The inbox is empty.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{%- endmacro %}
+
+{%- macro toolbar(field) -%}
+  {%- set form = field._form -%}
+  {%- set count = form.selected_messages() | length -%}
+  {%- set useful = form.useful_actions() -%}
+  {%- set live = request.headers.get("HX-Request") -%}
+  <div id="{{ field.id }}" class="bulk-toolbar"{{ kwargs|xmlattr }}>
+    <span class="bulk-idle">{{ form.inbox() | length }} messages</span>
+    <div class="bulk-active">
+      {% if count %}<output aria-live="polite">{{ count }} selected</output>{% endif %}
+      <div role="group">
+        {% for action in (field.mark_read, field.mark_unread, field.archive) %}
+          {% if useful[action] or not live %}{{ action(class_="secondary") }}{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{%- endmacro %}

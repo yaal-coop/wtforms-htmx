@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='bulk_actions.css') }}">
+{% endblock %}
+
+{% block content %}
+  <form method="post">
+    <div class="demo-area">
+      <div class="bulk-bar">
+        {# Outside the swapped table and toolbar: the clicked button keeps the focus. #}
+        <div class="bulk-select">
+          <span id="select-label">Select</span>
+          <div role="group" aria-labelledby="select-label">
+            {% for value, label in form.select_shortcuts %}
+              {{ form.select(value=value, label=label, id=False, class_="outline secondary") }}
+            {% endfor %}
+            {{ form.clear(class_="outline secondary") }}
+          </div>
+        </div>
+        {{ form.toolbar() }}
+      </div>
+      {{ form.selection() }}
+    </div>
+  </form>
+{% endblock %}
