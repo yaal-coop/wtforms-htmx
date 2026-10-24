@@ -40,6 +40,9 @@ entry:
         if form.submitter is row.form.archive:
             archive(row.form.data)
 
+In a text field, Enter clicks the first submit button of the form. To
+choose another button, see :ref:`migrate-enter-key`.
+
 Multi-form pages
 ----------------
 

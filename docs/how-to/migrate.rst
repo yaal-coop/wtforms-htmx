@@ -305,6 +305,24 @@ The htmx attributes of wtforms-htmx have no effect
 The CSRF token shows a label
     The wrapper wraps hidden fields. Render them bare, see step 4.
 
+.. _migrate-enter-key:
+
+Enter clicks the wrong button
+    In a text field, Enter clicks the first submit button of the form,
+    such as a mutation button placed before the save button. Render a
+    hidden copy of the expected button first in the :mdn-tag:`form`:
+
+    .. code-block:: jinja
+
+        <form method="post">
+          {{ form.save(hidden=True, tabindex=-1, aria_hidden="true", id=False) }}
+          ...
+          {{ form.save() }}
+        </form>
+
+    The copy has the same ``name``, so
+    :attr:`~wtforms_htmx.HtmxFormMixin.submitter` is still ``form.save``.
+
 An unknown attribute shows in the HTML, such as ``icon="user"``
     The field is rendered without the wrapper, for example with
     ``field.widget(...)``, so its presentation options reach the widget.
