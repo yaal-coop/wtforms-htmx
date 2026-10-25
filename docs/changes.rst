@@ -1,8 +1,10 @@
 Changes
 =======
 
-Unreleased
-----------
+Version 0.1.3
+-------------
+
+Released 2026-10-25
 
 - A field with a selector target and a field target on the same event
   sends one request instead of two.

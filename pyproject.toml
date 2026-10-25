@@ -1,6 +1,6 @@
 [project]
 name = "wtforms-htmx"
-version = "0.1.2"
+version = "0.1.3"
 description = "Interactive WTForms forms declared in Python and powered by htmx, with no JavaScript to write."
 readme = "README.md"
 license = "BSD-3-Clause"
