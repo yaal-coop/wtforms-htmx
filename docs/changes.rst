@@ -6,6 +6,8 @@ Unreleased
 
 - A field with a selector target and a field target on the same event
   sends one request instead of two.
+- On htmx 2, a link or a button inside a field no longer inherits the
+  htmx attributes of the field, such as its target or its form values.
 
 Version 0.1.2
 -------------

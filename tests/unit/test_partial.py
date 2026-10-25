@@ -182,7 +182,8 @@ def test_inline_validation_returns_the_field():
         headers=htmx_headers("email", "email"),
     )
     assert form.partial() == HtmxResponse(
-        '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
+        '<input hx-disinherit="hx-include hx-swap hx-sync"'
+        ' hx-include="closest form" hx-post="" hx-swap="outerHTML"'
         ' hx-sync="this:replace" hx-trigger="blur changed" id="email" name="email"'
         ' required type="text" value="alice@example.com">',
         {},
@@ -290,7 +291,8 @@ def test_list_button_returns_the_list_alone():
         headers=htmx_headers("add_tag", "tags"),
     )
     attrs = (
-        'hx-include="closest form" hx-post="" hx-swap="outerHTML"'
+        'hx-disinherit="hx-include hx-swap hx-sync"'
+        ' hx-include="closest form" hx-post="" hx-swap="outerHTML"'
         ' hx-sync="this:replace" hx-trigger="blur changed"'
     )
     assert form.partial() == HtmxResponse(

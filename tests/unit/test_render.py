@@ -35,7 +35,8 @@ def test_inline_validation_renders_the_form_wide_defaults():
         email = StringField()
 
     assert _Form().email() == (
-        '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
+        '<input hx-disinherit="hx-include hx-swap hx-sync"'
+        ' hx-include="closest form" hx-post="" hx-swap="outerHTML"'
         ' hx-sync="this:replace" hx-trigger="blur changed" id="email" name="email"'
         ' type="text" value="">'
     )
@@ -191,7 +192,9 @@ class _TagsForm(HtmxForm):
 def test_button_renders_the_request_attrs_of_its_target():
     """A button posts the form without validation and swaps its target."""
     assert _TagsForm().add_tag() == (
-        '<button formnovalidate hx-include="closest form" hx-post=""'
+        "<button formnovalidate"
+        ' hx-disinherit="hx-include hx-swap hx-target hx-vals"'
+        ' hx-include="closest form" hx-post=""'
         ' hx-swap="outerHTML" hx-target="#tags" hx-vals="{&#34;add_tag&#34;: &#34;&#34;}"'
         ' id="add_tag" name="add_tag" type="submit" value="">+</button>'
     )
@@ -444,7 +447,8 @@ class _PreviewForm(HtmxForm):
 def test_selector_target_renders_on_the_source():
     """A field with a selector target sends its own request and swaps the selector."""
     assert _PreviewForm().content() == (
-        '<input hx-include="closest form" hx-post="" hx-swap="outerHTML"'
+        '<input hx-disinherit="hx-include hx-swap hx-sync hx-target"'
+        ' hx-include="closest form" hx-post="" hx-swap="outerHTML"'
         ' hx-sync="this:replace" hx-target="#preview"'
         ' hx-trigger="input delay:300ms" id="content"'
         ' name="content" type="text" value="">'
@@ -620,3 +624,25 @@ def test_deeply_nested_form_inherits_the_settings():
 
     form = _Form(meta={"htmx_endpoint": "/merge"})
     assert attr(form.middle.inner.city(), "hx-post") == "/merge"
+
+
+def test_container_keeps_its_htmx_attrs_from_its_children():
+    """A list of radios lists its inherited ``hx-*`` attributes in ``hx-disinherit``."""
+
+    class _Form(HtmxForm):
+        color = RadioField(
+            choices=["red", "blue"], render_kw={"hx-boost:inherited": "true"}
+        )
+        dst = StringField().triggered_by("color", on="change")
+
+    html = _Form().color()
+    assert attr(html, "hx-disinherit") == "hx-include hx-swap hx-sync"
+
+
+def test_explicit_disinherit_is_kept():
+    """An ``hx-disinherit`` set in ``render_kw`` replaces the computed one."""
+
+    class _Form(HtmxForm):
+        email = StringField(render_kw={"hx-disinherit": "*"})
+
+    assert attr(_Form().email(), "hx-disinherit") == "*"

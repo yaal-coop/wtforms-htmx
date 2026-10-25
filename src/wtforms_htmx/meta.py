@@ -244,6 +244,7 @@ class HtmxMeta(DefaultMeta):
         if isinstance(field, SelectFieldBase._Option):
             merged = {**(field.render_kw or {}), **(render_kw or {})}
             self._inject_submit_vals(field, merged)
+            _add_disinherit(merged)
             return Markup(field.widget(field, **merged))
 
         # Precedence: library attrs < field render_kw < call-site render_kw.
@@ -253,6 +254,7 @@ class HtmxMeta(DefaultMeta):
 
         merged = {**lib_attrs, **(field.render_kw or {}), **(render_kw or {})}
         self._inject_submit_vals(field, merged)
+        _add_disinherit(merged)
 
         wrapper = _state(field, "_htmx_wrapper", True)
         if wrapper is False:
@@ -313,6 +315,44 @@ _SOURCE_ATTR = "data-wtforms-htmx-for"
 
 
 _TYPING_EVENTS = frozenset({"input", "keyup", "keydown", "keypress"})
+
+# htmx 2 attributes that no element inherits from its ancestors.
+_NOT_INHERITED = frozenset(
+    {
+        "hx-delete",
+        "hx-disinherit",
+        "hx-get",
+        "hx-inherit",
+        "hx-patch",
+        "hx-post",
+        "hx-put",
+        "hx-swap-oob",
+        "hx-trigger",
+    }
+)
+
+
+def _add_disinherit(attrs: dict[str, Any]) -> None:
+    """Keep the ``hx-*`` attributes of an element from reaching its children.
+
+    htmx 2 passes most attributes down to the elements inside, so a link in
+    a list of checkboxes would get their target and their form values.
+    ``hx-disinherit`` lists them by name: ``*`` would also hide the
+    ``hx-boost`` of an ancestor. An ``hx-disinherit`` already set is kept.
+    """
+    if "hx-disinherit" in attrs:
+        return
+
+    names = sorted(
+        name
+        for name in attrs
+        if name.startswith("hx-")
+        and ":" not in name
+        and not name.startswith("hx-on")
+        and name not in _NOT_INHERITED
+    )
+    if names:
+        attrs["hx-disinherit"] = " ".join(names)
 
 
 def _clauses(event: str) -> list[str]:

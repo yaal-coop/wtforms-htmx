@@ -119,6 +119,12 @@ The library works on both versions. These points shape how:
   :mdn-tag:`template`, with :htmx-attr:`hx-swap-oob` on the extra. The
   :htmx-tag:`hx-partial` of htmx 2.0.11 loses its target when an
   earlier swap removed the element that sent the request (htmx #4162).
+- **Inheritance.** htmx 2 passes most attributes of an element to the
+  elements inside it. A boosted link inside a list of checkboxes would
+  then get their target and their form values. The library lists the
+  attributes it sets in :htmx-attr:`hx-disinherit`, by name: ``*`` would
+  also hide an :htmx-attr:`hx-boost` set higher up. htmx 4 only passes
+  the attributes marked ``:inherited``.
 - **No** :htmx-header:`hx-trigger-name`. htmx 4 does not send this
   header, so the library ignores it on htmx 2 too. Routing behaves the
   same on both versions.
