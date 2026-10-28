@@ -103,12 +103,13 @@ aside.examples #htmx-toggle-form {
  * Cards / errors / utility
  * ------------------------------------------------------------------ */
 
-article.example-card {
-  margin-bottom: 1rem;
+body > main:has(> .index-logo) {
+  display: grid;
+  place-items: center;
 }
 
-article.example-card header {
-  margin-bottom: 0.25rem;
+.index-logo {
+  width: min(100%, 40rem);
 }
 
 .errors {

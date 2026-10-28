@@ -1,13 +1,13 @@
-"""End-to-end tests for the overview page."""
+"""End-to-end tests for the index page."""
 
 from examples import EXAMPLES
 from playwright.sync_api import expect
 
 
 def test_index_loads(page, nav):
-    """The overview page has the gallery title and a nav link per example."""
+    """The index page has the gallery title and a nav link per example."""
     expect(page).to_have_title("wtforms-htmx examples")
-    for label in ("Overview", *EXAMPLES.values()):
+    for label in ("Index", *EXAMPLES.values()):
         expect(nav.get_by_role("link", name=label, exact=True)).to_be_visible()
 
 
