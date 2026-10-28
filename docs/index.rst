@@ -3,7 +3,7 @@
 wtforms-htmx
 ============
 
-.. image:: _static/logo.webp
+.. image:: _static/logo-light.svg
    :align: center
    :alt: wtforms-htmx
 

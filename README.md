@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/_static/logo-dark.webp">
-    <img src="docs/_static/logo.webp" alt="wtforms-htmx">
+    <source media="(prefers-color-scheme: dark)" srcset="https://wtforms-htmx.readthedocs.io/en/latest/_static/logo-dark.svg">
+    <img src="https://wtforms-htmx.readthedocs.io/en/latest/_static/logo-light.svg" alt="wtforms-htmx">
   </picture>
 </p>
 
