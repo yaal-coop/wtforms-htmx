@@ -122,8 +122,8 @@ def value_add(form: Any, source: Any, target: Any) -> None:
 
     .. code-block:: jinja
 
-        {% for value, label in form.tags.choices %}
-          {{ form.add_tag(value=value, label=label, id=False) }}
+        {% for choice in form.tags.iter_choices() %}
+          {{ form.add_tag(value=choice.value, label=choice.label, id=False) }}
         {% endfor %}
     """
     _require(target, SelectMultipleField, "value_add")
