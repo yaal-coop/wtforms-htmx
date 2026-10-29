@@ -54,6 +54,7 @@ from wtforms.widgets import CheckboxInput
 from wtforms_htmx.mutations import value_set
 
 from . import bp
+from ._code import Excerpt
 from ._shared import _INITIAL_STATE
 from ._shared import _STATE
 from ._shared import ExampleForm
@@ -203,3 +204,16 @@ def bulk_actions():
 
     flash(f"{text}.", "success")
     return redirect(url_for("main.bulk_actions"))
+
+
+#: Code shown under the demo.
+CODE = [
+    _inbox_choices,
+    select_matching,
+    ToolbarForm,
+    BulkActionsForm,
+    bulk_actions,
+    Excerpt("templates/bulk_actions.html", "{% block content %}", "{% endblock %}"),
+    Excerpt("templates/_bulk_actions_widgets.html", "macro toolbar", "endmacro"),
+    Excerpt("static/bulk_actions.css", "/* CSS, not JavaScript", "}"),
+]

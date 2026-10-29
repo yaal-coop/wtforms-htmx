@@ -8,24 +8,11 @@ their own slug, the title stops changing it.
    :no-members:
    :no-index:
 
-.. code-block:: python
+.. literalinclude:: ../../examples/title_slug.py
+   :pyobject: derive_slug
 
-    def derive_slug(form, source, target):
-        user_slug = (form.slug.data or "").strip()
-        if user_slug and user_slug != form.last_auto_slug.data:
-            return None
-
-        target.data = form.last_auto_slug.data = slugify(form.title.data)
-        return [None, form.last_auto_slug]
-
-    class TitleSlugForm(HtmxForm):
-        title = StringField("Title")
-        slug = StringField("Slug")
-        last_auto_slug = HiddenField()
-        save = SubmitField("Save")
-
-        # Typing a title derives the slug, until the user edits the slug.
-        title.triggers("slug", derive_slug)
+.. literalinclude:: ../../examples/title_slug.py
+   :pyobject: TitleSlugForm
 
 ``last_auto_slug`` holds the last slug the server derived. When the
 posted slug differs from it, the user has edited the slug, and the

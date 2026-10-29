@@ -1,0 +1,10 @@
+{# The code of the example, under the demo. #}
+<section class="example-code">
+  <h2>Code</h2>
+  {% for snippet in example_code() %}
+    <figure class="code-file">
+      <figcaption>examples/{{ snippet.path }}</figcaption>
+      {{ snippet.html }}
+    </figure>
+  {% endfor %}
+</section>

@@ -9,34 +9,14 @@ out-of-band swaps.
    :no-members:
    :no-index:
 
-.. code-block:: python
+.. literalinclude:: ../../examples/invoice.py
+   :pyobject: _totals_oob
 
-    def _totals_oob(form):
-        t = compute_totals(form)
-        return [
-            f'<output id="subtotal">{t.subtotal}</output>',
-            f'<output id="vat_total">{t.vat_total}</output>',
-            f'<output id="grand_total">{t.grand_total}</output>',
-        ]
+.. literalinclude:: ../../examples/invoice.py
+   :pyobject: recompute_total
 
-    def recompute_total(form, source, target):
-        sub = target._form
-        qty = sub.quantity.data or 0
-        price = sub.unit_price.data or Decimal(0)
-        vat_rate = Decimal(sub.vat_rate.data or 0) / Decimal(100)
-        target.data = f"{Decimal(qty) * price * (Decimal(1) + vat_rate):.2f}"
-        return [None, *_totals_oob(form)]
-
-    class LineItem(HtmxForm):
-        quantity = IntegerField("Qty")
-        unit_price = DecimalField("Unit price")
-        vat_rate = IntegerField("VAT %")
-        total = StringField("Total", render_kw={"readonly": True})
-
-        # Each input recomputes the row total and the invoice totals.
-        quantity.triggers("total", recompute_total)
-        unit_price.triggers("total", recompute_total)
-        vat_rate.triggers("total", recompute_total)
+.. literalinclude:: ../../examples/invoice.py
+   :pyobject: LineItem
 
 The row's ``total`` field is the primary swap target. The leading
 ``None`` in the returned iterable keeps the default widget render. The

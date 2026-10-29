@@ -69,6 +69,7 @@ example = [
     "mistune>=3",
     "pgeocode>=0.5.0",
     "pycountry>=24",
+    "pygments>=2.21.0",
 ]
 e2e = [
     { include-group = "example" },

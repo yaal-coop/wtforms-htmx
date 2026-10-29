@@ -654,3 +654,42 @@ main form ul:not([role]) > li input[type="submit"] {
   opacity: 0.9;
   cursor: grabbing;
 }
+
+/* ------------------------------------------------------------------
+ * Code of the example, under the demo: one block per file
+ * ------------------------------------------------------------------ */
+
+.example-code {
+  margin-top: 3rem;
+}
+
+.example-code h2 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.code-file {
+  margin: 0 0 1.25rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  overflow: hidden;
+}
+
+.code-file figcaption {
+  padding: 0.35rem 1rem;
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  background: var(--pico-code-background-color);
+  color: var(--pico-muted-color);
+  font-family: var(--pico-font-family-monospace);
+  font-size: 0.8rem;
+}
+
+.code-file pre {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 0;
+  background: none;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}

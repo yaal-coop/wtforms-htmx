@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import os
+import sys
 
 from flask import Blueprint
 from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import request
+from flask import Response
 from flask import url_for
+
+from ._code import default_code
+from ._code import snippets
+from ._code import stylesheet
 
 bp = Blueprint("main", __name__)
 
@@ -51,6 +57,11 @@ def toggle_htmx():
     return resp
 
 
+@bp.route("/pygments.css")
+def pygments_css():
+    return Response(stylesheet(), mimetype="text/css")
+
+
 from . import address  # noqa: E402, F401
 from . import attendance  # noqa: E402, F401
 from . import auto_save  # noqa: E402, F401
@@ -90,7 +101,20 @@ def create_app() -> Flask:
     @app.context_processor
     def inject_examples():
         view = (request.endpoint or "").removeprefix(f"{bp.name}.")
-        return {"examples": EXAMPLES, "example_title": EXAMPLES.get(view)}
+        module = sys.modules.get(f"{__name__}.{view}") if view in EXAMPLES else None
+
+        def example_code():
+            if module is None:
+                return []
+
+            return snippets(getattr(module, "CODE", None) or default_code(module))
+
+        # A callable: partial responses render templates too, and never use it.
+        return {
+            "examples": EXAMPLES,
+            "example_title": EXAMPLES.get(view),
+            "example_code": example_code,
+        }
 
     app.register_blueprint(bp)
     return app

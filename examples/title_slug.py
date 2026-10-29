@@ -79,6 +79,7 @@ from wtforms import SubmitField
 from wtforms.validators import Optional
 
 from . import bp
+from ._code import Excerpt
 from ._shared import _INITIAL_STATE
 from ._shared import _STATE
 from ._shared import ExampleForm
@@ -182,3 +183,12 @@ def title_slug():
     form.populate_obj(state)
     flash(f"Saved slug {state.slug!r}.", "success")
     return redirect(url_for("main.title_slug"))
+
+
+#: Code shown under the demo.
+CODE = [
+    derive_slug,
+    TitleSlugForm,
+    title_slug,
+    Excerpt("templates/title_slug.html", "{% block content %}", "{% endblock %}"),
+]

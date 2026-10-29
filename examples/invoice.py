@@ -60,6 +60,7 @@ from wtforms_htmx.mutations import list_add
 from wtforms_htmx.mutations import list_remove
 
 from . import bp
+from ._code import Excerpt
 from ._shared import _INITIAL_STATE
 from ._shared import _STATE
 from ._shared import ExampleForm
@@ -258,3 +259,17 @@ def invoice():
     form.populate_obj(state)
     flash(f"Saved invoice: grand total {totals.grand_total}.", "success")
     return redirect(url_for("main.invoice"))
+
+
+#: Code shown under the demo.
+CODE = [
+    _totals_oob,
+    recompute_total,
+    add_line_and_refresh,
+    rm_line_and_refresh,
+    LineItem,
+    InvoiceForm,
+    invoice,
+    Excerpt("templates/invoice.html", "<tfoot>", "</tfoot>"),
+    Excerpt("templates/_invoice_widgets.html", "macro line_list", "endmacro"),
+]

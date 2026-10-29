@@ -2031,6 +2031,7 @@ dev = [
     { name = "pgeocode" },
     { name = "prek" },
     { name = "pycountry" },
+    { name = "pygments" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-xdist" },
@@ -2051,6 +2052,7 @@ e2e = [
     { name = "mistune" },
     { name = "pgeocode" },
     { name = "pycountry" },
+    { name = "pygments" },
     { name = "pytest" },
     { name = "pytest-playwright" },
     { name = "pytest-xdist" },
@@ -2061,6 +2063,7 @@ example = [
     { name = "mistune" },
     { name = "pgeocode" },
     { name = "pycountry" },
+    { name = "pygments" },
 ]
 test = [
     { name = "flask" },
@@ -2080,6 +2083,7 @@ dev = [
     { name = "pgeocode", specifier = ">=0.5.0" },
     { name = "prek", specifier = ">=0.3.9" },
     { name = "pycountry", specifier = ">=24" },
+    { name = "pygments", specifier = ">=2.21.0" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-cov", specifier = ">=5.0" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
@@ -2099,6 +2103,7 @@ e2e = [
     { name = "mistune", specifier = ">=3" },
     { name = "pgeocode", specifier = ">=0.5.0" },
     { name = "pycountry", specifier = ">=24" },
+    { name = "pygments", specifier = ">=2.21.0" },
     { name = "pytest", specifier = ">=8.0" },
     { name = "pytest-playwright", specifier = ">=0.5" },
     { name = "pytest-xdist", specifier = ">=3.8.0" },
@@ -2109,6 +2114,7 @@ example = [
     { name = "mistune", specifier = ">=3" },
     { name = "pgeocode", specifier = ">=0.5.0" },
     { name = "pycountry", specifier = ">=24" },
+    { name = "pygments", specifier = ">=2.21.0" },
 ]
 test = [
     { name = "flask", specifier = ">=3.0" },

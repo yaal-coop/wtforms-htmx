@@ -9,6 +9,7 @@
           href="{{ url_for('static', filename='vendor/pico.min.css') }}">
     <link rel="stylesheet"
           href="{{ url_for('static', filename='app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('main.pygments_css') }}">
     <script src="{{ url_for('static', filename='toggle-htmx.js') }}" defer></script>
     <script src="{{ url_for('static', filename='flash-dismiss.js') }}" defer></script>
     {# Loaded here rather than in the task list's extra_head: scripts injected
@@ -68,6 +69,8 @@
 
       {% if example_title %}<h1>{{ example_title }}</h1>{% endif %}
       {% block content %}{% endblock %}
+
+      {% if example_title %}{% include "_code.html" %}{% endif %}
     </main>
   </body>
 </html>
