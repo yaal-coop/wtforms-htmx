@@ -44,6 +44,14 @@ class PostForm(HtmxForm):
 
 Full documentation: <https://wtforms-htmx.readthedocs.io/>
 
+## Related packages
+
+- [wtforms-htmx-components](https://wtforms-htmx-components.readthedocs.io/)
+  provides ready-made interactive fields, such as a combobox.
+- [flask-wtforms-htmx](https://flask-wtforms-htmx.readthedocs.io/)
+  provides `HtmxFlaskForm`, a drop-in `FlaskForm` for
+  [Flask-WTF](https://flask-wtf.readthedocs.io/).
+
 ## Example app
 
 A runnable gallery of examples lives in `examples/`. The

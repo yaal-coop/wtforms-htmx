@@ -46,9 +46,17 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "flask": ("https://flask.palletsprojects.com/en/stable/", None),
     "flask-wtf": ("https://flask-wtf.readthedocs.io/en/latest/", None),
+    "flask-wtforms-htmx": (
+        "https://flask-wtforms-htmx.readthedocs.io/en/stable/",
+        None,
+    ),
     "markupsafe": ("https://markupsafe.palletsprojects.com/en/stable/", None),
     "webtest": ("https://docs.pylonsproject.org/projects/webtest/en/latest/", None),
     "wtforms": ("https://wtforms.readthedocs.io/en/stable/", None),
+    "wtforms-htmx-components": (
+        "https://wtforms-htmx-components.readthedocs.io/en/stable/",
+        None,
+    ),
 }
 
 extlinks = {
@@ -97,6 +105,11 @@ html_context = {
         ProjectLink(
             "Issue Tracker", "https://github.com/yaal-coop/wtforms-htmx/issues/"
         ),
+        ProjectLink(
+            "wtforms-htmx-components",
+            "https://wtforms-htmx-components.readthedocs.io/",
+        ),
+        ProjectLink("flask-wtforms-htmx", "https://flask-wtforms-htmx.readthedocs.io/"),
     ],
 }
 html_sidebars = {

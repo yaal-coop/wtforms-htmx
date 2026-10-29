@@ -10,9 +10,10 @@ The guide assumes knowledge of WTForms and of the basics of htmx. It
 stops once the forms are ready for interactions. To add them, see
 :doc:`/how-to/mutations` and :doc:`/how-to/inline_validation`.
 
-With Flask-WTF, the flask-wtforms-htmx package does part of the work.
-Its ``HtmxFlaskForm`` reads the request headers and answers htmx
-requests in ``validate_on_submit()``. It covers the view changes of
+With Flask-WTF, :external+flask-wtforms-htmx:doc:`flask-wtforms-htmx <index>`
+does part of the work. Its :class:`~flask_wtforms_htmx.HtmxFlaskForm`
+reads the request headers and answers htmx requests in
+:meth:`~flask_wtforms_htmx.HtmxFlaskForm.validate_on_submit`. It covers the view changes of
 :ref:`migrate-switch` and the guard of :ref:`migrate-guard`.
 
 1. List what to change

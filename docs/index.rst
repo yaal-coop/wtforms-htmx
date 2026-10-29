@@ -80,6 +80,16 @@ Features
   :class:`~wtforms.fields.FieldList` add/remove/reorder, dependent fields: all declarative
   in a few lines.
 
+Related packages
+----------------
+
+- :external+wtforms-htmx-components:doc:`wtforms-htmx-components <index>`
+  provides ready-made interactive fields, such as a combobox.
+- :external+flask-wtforms-htmx:doc:`flask-wtforms-htmx <index>`
+  provides :class:`~flask_wtforms_htmx.HtmxFlaskForm`, a drop-in
+  :class:`~flask_wtf.FlaskForm` for
+  :external+flask-wtf:doc:`Flask-WTF <index>`.
+
 .. toctree::
     :caption: Overview
     :maxdepth: 1

@@ -7,9 +7,11 @@ trigger declarations.
 
 For the ready-made version with single/multi/free variants, a
 keyboard-navigation recipe and a ready-to-style ARIA wiring, install
-`wtforms-htmx-components <https://github.com/yaal-coop/wtforms-htmx-components>`_
+:external+wtforms-htmx-components:doc:`wtforms-htmx-components <index>`
 and pick the right composite field
-(``ComboboxSingleField`` / ``ComboboxMultiField``).
+(:class:`~wtforms_htmx_components.ComboboxSingleField` /
+:class:`~wtforms_htmx_components.ComboboxMultiField`). See its
+:external+wtforms-htmx-components:doc:`combobox guide <how-to/combobox>`.
 
 .. automodule:: examples.combobox
    :no-members:
