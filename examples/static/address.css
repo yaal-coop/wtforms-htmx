@@ -4,13 +4,12 @@
  * The screencast toggles ``same_billing`` off and on; while it's off,
  * the billing block is revealed below the delivery block, almost
  * doubling the form height. ``sphinxcontrib-screencast`` crops to the
- * locator bounding box measured at the end of the run, which lands on
- * the collapsed state, so without a reserved minimum height the
- * revealed billing block falls outside the captured frame.
+ * locator bounding box measured in the collapsed state, so the minimum
+ * height reserves room for the revealed billing block.
  * ------------------------------------------------------------------ */
 
 .demo-area {
-  min-height: 42rem;
+  min-height: 64rem;
 }
 
 /* ------------------------------------------------------------------

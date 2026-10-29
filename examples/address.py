@@ -6,6 +6,7 @@ form.
 
 .. screencast:: |examples|/address
    :locator: .demo-area
+   :viewport-height: 1440
    :autoplay:
    :muted:
    :loop:
