@@ -83,7 +83,12 @@ e2e = [
 [tool.pytest.ini_options]
 testpaths = ["tests/unit"]
 pythonpath = ["."]
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    # pytest>=9.2 flags the base_url fixture of pytest_playwright._BaseUrlFallback (0.10.0).
+    # Remove once pytest-playwright makes it a non-instance method.
+    "ignore:Session-scoped fixtures defined as instance methods:pytest.PytestRemovedIn10Warning",
+]
 
 [tool.coverage.run]
 branch = true
