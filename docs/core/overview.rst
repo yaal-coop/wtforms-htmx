@@ -105,7 +105,7 @@ The templates:
 .. code-block:: html+jinja
    :caption: templates/post.html
 
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.0/dist/htmx.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@4.0.1/dist/htmx.min.js"></script>
     <form method="post">
       {{ form.title() }}
       {{ form.slug() }}
