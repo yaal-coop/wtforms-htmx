@@ -85,8 +85,8 @@ class HtmxMeta(DefaultMeta):
     lists always validate on ``change``. File and hidden inputs do not
     validate inline."""
 
-    # No ``changed``: it never fires on a from:body listener on htmx 4.0.0
-    # (htmx#4033, fixed by htmx#4035 and htmx#4096 but unreleased).
+    # No ``changed``: an ``input`` event always changes the value, and htmx 2
+    # and htmx 4 check ``changed`` at different times.
     htmx_default_trigger: str = "input delay:200ms"
     """Default :htmx-attr:`hx-trigger` event for
     :meth:`.triggers() <wtforms.fields.core.UnboundField.triggers>` /

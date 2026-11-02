@@ -119,10 +119,6 @@ validate it, for instance when it already has a value:
 
 See :doc:`/explanation/mutations` for the details.
 
-On htmx 4.0.0, an event with the ``changed`` modifier never fires when
-the source is another field (see :ref:`source rendering
-<trigger-sources>`).
-
 React to any field change
 -------------------------
 

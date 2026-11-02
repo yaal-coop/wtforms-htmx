@@ -11,9 +11,6 @@
     <script src="{{ url_for('static', filename='vendor/htmx2/head-support.js') }}"></script>
   {% endif %}
 {% else %}
-  {# htmx 4.0.0 empties a focused input inside the swapped content while
-     settling (htmx#4056, fixed but unreleased). Remove once a release has it. #}
-  <meta name="htmx-config" content='{"defaultSettleDelay": 0}'>
   <script src="{{ url_for('static', filename='vendor/htmx4/htmx.min.js') }}"></script>
   {# hx-head extension: htmx 4's counterpart to head-support, merging
      the response <head> into the current one on boosted nav. #}

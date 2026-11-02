@@ -99,14 +99,6 @@ The library works on both versions. These points shape how:
   needs a quoted value with a space (htmx #4010), which htmx 2 rejects.
   ``blur`` and ``focus`` do not bubble up to ``body``, so the library
   listens to ``focusout`` and ``focusin`` instead.
-- **No** ``changed`` **on listeners.** On htmx 4.0.0, ``changed`` never
-  fires on a ``from:body`` listener (htmx #4033). The default event is
-  ``input delay:200ms``.
-- **Focused input inside the swapped content.** On htmx 4.0.0, a swap
-  empties an input that has the focus and sits inside the swapped
-  content, such as a filter that re-renders its own list (htmx #4056).
-  Set ``htmx.config.defaultSettleDelay`` to ``0`` to avoid it, as the
-  examples do.
 - **Out-of-band swaps.** Both versions parse a response as if it were
   outside a :mdn-tag:`table`, so a :mdn-tag:`tbody` or a :mdn-tag:`tr`
   marked with :htmx-attr:`hx-swap-oob` is dropped when it follows other

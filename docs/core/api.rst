@@ -72,10 +72,6 @@ and the listening field waits for events from elements that carry it.
 A direct ``field.widget(...)`` call in a page template skips that
 attribute, so the source triggers nothing.
 
-On htmx 4.0.0, an ``on=`` event with the :htmx-attr:`hx-trigger`
-``changed`` modifier never fires when the source is another field. The
-default event, ``input delay:200ms``, does not use it.
-
 .. automethod:: wtforms.fields.core.UnboundField.triggers
 
 .. automethod:: wtforms.fields.core.UnboundField.triggered_by
