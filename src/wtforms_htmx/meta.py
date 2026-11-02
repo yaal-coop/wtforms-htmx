@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import Any
 from typing import TYPE_CHECKING
 
@@ -18,7 +17,6 @@ from .tree import _walk_fields
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from collections.abc import Mapping
 
 
 class HtmxMeta(DefaultMeta):
@@ -113,10 +111,6 @@ class HtmxMeta(DefaultMeta):
         class MyForm(HtmxForm):
             class Meta:
                 htmx_submit_widgets = HtmxMeta.htmx_submit_widgets + (MyButton,)
-
-    A registered widget must render its ``value`` attribute from
-    ``field._value()``, unless the template passes ``value=``. Otherwise
-    the value sent with htmx differs from the one a plain submit sends.
     """
 
     htmx_auto_mutate: bool = True
@@ -243,7 +237,6 @@ class HtmxMeta(DefaultMeta):
         """
         if isinstance(field, SelectFieldBase._Option):
             merged = {**(field.render_kw or {}), **(render_kw or {})}
-            self._inject_submit_vals(field, merged)
             _add_disinherit(merged)
             return Markup(field.widget(field, **merged))
 
@@ -253,7 +246,6 @@ class HtmxMeta(DefaultMeta):
             lib_attrs[_SOURCE_ATTR] = " ".join(tokens)
 
         merged = {**lib_attrs, **(field.render_kw or {}), **(render_kw or {})}
-        self._inject_submit_vals(field, merged)
         _add_disinherit(merged)
 
         wrapper = _state(field, "_htmx_wrapper", True)
@@ -267,43 +259,6 @@ class HtmxMeta(DefaultMeta):
             return Markup(self.field_wrapper(field, merged))
 
         return Markup(field.widget(field, **merged))
-
-    def _inject_submit_vals(self, field, merged) -> None:
-        """Re-send a submit control's own ``name``/``value`` pair as ``hx-vals``.
-
-        Workaround for htmx#4073. The value matches what the widget renders,
-        so htmx and a plain submit send the same pair. An explicit ``hx-vals``
-        is left alone.
-        """
-        # htmx 4 drops the pair of a submit control with its own request attribute
-        # (htmx#4073, fixed but unreleased). Remove once a release has the fix.
-        if not isinstance(field.widget, self.htmx_submit_widgets):
-            return
-
-        if self._htmx_request_attr not in merged:
-            return
-
-        if "hx-vals" in merged:
-            return
-
-        merged["hx-vals"] = json.dumps(
-            {field.name: _rendered_submit_value(field, merged)}
-        )
-
-
-def _rendered_submit_value(field: Any, merged: Mapping[str, Any]) -> str:
-    """Return the ``value`` attribute a submit widget renders for ``field``.
-
-    Workaround for htmx#4073. A call-time ``value=`` wins, ``SubmitInput``
-    renders the label, other widgets render ``field._value()``.
-    """
-    if "value" in merged:
-        return str(merged["value"])
-
-    if isinstance(field.widget, SubmitInput):
-        return str(field.label.text)
-
-    return str(field._value())
 
 
 # No ``changed``: see ``HtmxMeta.htmx_default_trigger``.

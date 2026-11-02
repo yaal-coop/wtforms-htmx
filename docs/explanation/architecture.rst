@@ -89,10 +89,6 @@ htmx 2 and htmx 4
 
 The library works on both versions. These points shape how:
 
-- **Submit buttons with their own request.** htmx 4.0.0 does not send
-  the :mdn-attr:`button#name` and :mdn-attr:`button#value` of a button that has its own
-  :htmx-attr:`hx-post` inside a :mdn-tag:`form` (htmx #4073). The
-  library adds them back with :htmx-attr:`hx-vals`.
 - **Listening to another field.** Both versions resolve a ``from:``
   selector once, so ``from:#<id>`` stops firing when the
   source element is swapped. The library listens on ``body`` instead,

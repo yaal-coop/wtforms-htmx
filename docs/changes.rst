@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 0.2.0
+-------------
+
+Unreleased
+
+- htmx 4 support requires htmx 4.0.1 or later. On htmx 4.0.0, a button
+  that sends its own request does not post its name and value.
+  Buttons no longer get an ``hx-vals`` attribute.
+
 Version 0.1.3
 -------------
 

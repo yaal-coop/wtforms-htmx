@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-
 import pytest
 from markupsafe import Markup
 from wtforms import BooleanField
@@ -23,7 +21,6 @@ from wtforms.csrf.session import SessionCSRF
 
 from wtforms_htmx import HtmxForm
 from wtforms_htmx.mutations import list_add
-from wtforms_htmx.mutations import list_remove
 
 from .helpers import attr
 
@@ -193,9 +190,9 @@ def test_button_renders_the_request_attrs_of_its_target():
     """A button posts the form without validation and swaps its target."""
     assert _TagsForm().add_tag() == (
         "<button formnovalidate"
-        ' hx-disinherit="hx-include hx-swap hx-target hx-vals"'
+        ' hx-disinherit="hx-include hx-swap hx-target"'
         ' hx-include="closest form" hx-post=""'
-        ' hx-swap="outerHTML" hx-target="#tags" hx-vals="{&#34;add_tag&#34;: &#34;&#34;}"'
+        ' hx-swap="outerHTML" hx-target="#tags"'
         ' id="add_tag" name="add_tag" type="submit" value="">+</button>'
     )
 
@@ -349,95 +346,6 @@ def test_choice_option_renders_bare_with_its_render_kw():
         '<input class="b" data-x="1" id="color-0" lang="en" name="color"'
         ' type="radio" value="r">'
     )
-
-
-class _ButtonsForm(HtmxForm):
-    items = FieldList(StringField(), min_entries=2)
-    rm_item = ButtonField("Remove").triggers("items", list_remove)
-    save = SubmitField("Save it").triggers("items", list_add)
-    plain = ButtonField("Plain")
-
-
-@pytest.mark.parametrize(
-    ("field_name", "render_kw"),
-    [
-        ("rm_item", {"value": "1"}),
-        ("rm_item", {"value": 3}),
-        ("rm_item", {"value": 'a"b<c>&é'}),
-        ("rm_item", {}),
-        ("save", {"value": "zz"}),
-        ("save", {}),
-    ],
-    ids=[
-        "button-str",
-        "button-int",
-        "button-special",
-        "button-default",
-        "submit-str",
-        "submit-default",
-    ],
-)
-def test_button_hx_vals_repeats_the_rendered_value(field_name, render_kw):
-    """The ``hx-vals`` pair is exactly what a plain submit posts."""
-    html = _ButtonsForm()[field_name](**render_kw)
-    assert json.loads(attr(html, "hx-vals")) == {field_name: attr(html, "value")}
-
-
-def test_button_hx_vals_falls_back_to_the_field_data():
-    """Without a call-site ``value=``, a button posts its own data."""
-    html = _ButtonsForm(data={"rm_item": "7"}).rm_item()
-    assert attr(html, "value") == "7"
-    assert json.loads(attr(html, "hx-vals")) == {"rm_item": "7"}
-
-
-def test_submit_input_hx_vals_defaults_to_the_label():
-    """A ``SubmitField`` posts its label, so its ``hx-vals`` carries the label."""
-    assert json.loads(attr(_ButtonsForm().save(), "hx-vals")) == {"save": "Save it"}
-
-
-def test_button_without_request_gets_no_hx_vals():
-    """A button that sends no htmx request gets no ``hx-vals``."""
-    assert attr(_ButtonsForm().plain(), "hx-vals") is None
-
-
-def test_button_explicit_hx_vals_wins():
-    """An ``hx-vals`` passed when rendering is kept."""
-    html = _ButtonsForm().rm_item(value="1", **{"hx-vals": '{"rm_item": "9"}'})
-    assert json.loads(attr(html, "hx-vals")) == {"rm_item": "9"}
-
-
-def test_button_option_hx_vals_repeats_the_choice_value():
-    """Each option button posts the parent field name with its own choice value."""
-
-    class _Form(HtmxForm):
-        items = FieldList(StringField(), min_entries=1)
-        pick = SelectField(
-            choices=[SelectChoice("a", "A"), SelectChoice("b<&>", 'Lab"el')],
-            option_widget=widgets.Button(),
-        ).triggers("items", list_add)
-
-    form = _Form()
-    htmls = [
-        opt(label=opt.choice.label, **form.htmx_submit_attrs(opt)) for opt in form.pick
-    ]
-    assert [(json.loads(attr(h, "hx-vals")), attr(h, "value")) for h in htmls] == [
-        ({"pick": "a"}, "a"),
-        ({"pick": "b<&>"}, "b<&>"),
-    ]
-
-
-def test_choices_container_listener_gets_no_hx_vals():
-    """A listening choices container posts its value natively, without ``hx-vals``."""
-
-    class _Form(HtmxForm):
-        query = StringField()
-        pick = SelectField(
-            choices=[SelectChoice("a", "A")], option_widget=widgets.Button()
-        ).triggered_by("query")
-
-    html = _Form().pick()
-    assert attr(html, "hx-post") == ""
-    assert attr(html, "hx-vals") is None
 
 
 class _PreviewForm(HtmxForm):
