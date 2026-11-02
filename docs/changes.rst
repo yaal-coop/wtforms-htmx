@@ -6,9 +6,11 @@ Version 0.2.0
 
 Unreleased
 
-- htmx 4 support requires htmx 4.0.1 or later. On htmx 4.0.0, a button
-  that sends its own request does not post its name and value.
-  Buttons no longer get an ``hx-vals`` attribute.
+- htmx 4 support requires htmx 4.0.1 or later. Buttons no longer get an
+  ``hx-vals`` attribute, so on htmx 4.0.0 a button that sends its own
+  request does not post its name and value. On htmx 4, a button with a
+  trigger declaration must be a submit button: a ``type="button"``
+  button does not post them either, so its callback does not run.
 
 Version 0.1.3
 -------------

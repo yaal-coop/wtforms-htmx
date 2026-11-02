@@ -85,8 +85,8 @@ class HtmxMeta(DefaultMeta):
     lists always validate on ``change``. File and hidden inputs do not
     validate inline."""
 
-    # No ``changed``: an ``input`` event always changes the value, and htmx 2
-    # and htmx 4 check ``changed`` at different times.
+    # No ``changed``: htmx 2 checks it before the delay and htmx 4 after it,
+    # so the two versions would send different requests.
     htmx_default_trigger: str = "input delay:200ms"
     """Default :htmx-attr:`hx-trigger` event for
     :meth:`.triggers() <wtforms.fields.core.UnboundField.triggers>` /
@@ -111,6 +111,10 @@ class HtmxMeta(DefaultMeta):
         class MyForm(HtmxForm):
             class Meta:
                 htmx_submit_widgets = HtmxMeta.htmx_submit_widgets + (MyButton,)
+
+    A registered widget must render a submit button, with ``type="submit"``.
+    Otherwise htmx 4 does not post its name and value, and the click does
+    nothing without JavaScript.
     """
 
     htmx_auto_mutate: bool = True
